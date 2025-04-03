@@ -8,12 +8,15 @@ import {
   Stack,
   Switch,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import JsonViewer from "./JsonViewer"; // Assuming you have a JsonViewer component
 import { DocumentViewer } from "./DocumentViewer";
 import TextViewer from "./TextViewer"; // Assuming you have DocumentViewer component
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
-import { useNavigate } from "react-router-dom";
+import SendIcon from "@mui/icons-material/Send";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
 
 const data = {
@@ -60,14 +63,16 @@ const data = {
   },
 };
 
-function Document({ url, extension }) {
+function Document() {
   const navigate = useNavigate();
+  const documentId = useLocation().pathname.split("/")[2];
   const [docTxtSw, setDocTxtSw] = useState(false);
-  const [label, setLabel] = useState<string>("Doc");
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down("md"));
 
   const handleSwitchChange = (event:Event) => {
     setDocTxtSw(event.target.checked);
-    setLabel(event.target.checked ? "Document" : "Text");
+   
   };
 
   return (
@@ -115,65 +120,73 @@ function Document({ url, extension }) {
               {data.pdf.originalname}
             </Typography>
           </Box>
-          <Stack direction="row" spacing={2} alignItems="center" justifyContent="space-between" sx={{ width:"49%"} } >
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-around",
-                backgroundColor: "#1976d2",
-                paddingX: 2,
-                borderRadius: 4,
-              }}
-            >
-              <Typography
-                variant="body2"
+          <Stack
+            direction="row"
+            spacing={2}
+            alignItems="center"
+            justifyContent="space-between"
+            sx={{ width: "49%" }}
+          >
+            {!isSmallScreen && (
+              <Box
                 sx={{
-                  fontWeight: !docTxtSw ? "bold" : "normal",
-                  color: "white",
-                  marginRight: 2,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-around",
+                  backgroundColor: "#1976d2",
+                  paddingX: 2,
+                  borderRadius: 4,
                 }}
               >
-                Document
-              </Typography>
-              <FormGroup>
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={docTxtSw}
-                      onChange={(event) => {
-                        handleSwitchChange(event);
-                      }}
-                      sx={{
-                        "& .MuiSwitch-switchBase.Mui-checked": {
-                          color: "white", // Keeps the switch color gray when checked
-                        },
-                        "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track":
-                          {
-                            backgroundColor: "lightgray", // Keeps the track color light gray when checked
+                <Typography
+                  variant="body2"
+                  sx={{
+                    fontWeight: !docTxtSw ? "bold" : "normal",
+                    color: "white",
+                    marginRight: 2,
+                  }}
+                >
+                  Document
+                </Typography>
+                <FormGroup>
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={docTxtSw}
+                        onChange={(event) => {
+                          handleSwitchChange(event);
+                        }}
+                        sx={{
+                          "& .MuiSwitch-switchBase.Mui-checked": {
+                            color: "white",
                           },
-                        "& .MuiSwitch-track": {
-                          backgroundColor: "lightgray", // Keeps track in light gray even when inactive
-                        },
-                      }}
-                    />
-                  }
-                  label=""
-                />
-              </FormGroup>
-              <Typography
-                variant="body2"
-                sx={{
-                  fontWeight: docTxtSw ? "bold" : "normal",
-                  marginLeft: -2,
-                  color: "white",
-                }}
-              >
-                Text
-              </Typography>
-            </Box>
-
-            <Button>{`A`}</Button>
+                          "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track":
+                            {
+                              backgroundColor: "lightgray",
+                            },
+                          "& .MuiSwitch-track": {
+                            backgroundColor: "lightgray",
+                          },
+                        }}
+                      />
+                    }
+                    label=""
+                  />
+                </FormGroup>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    fontWeight: docTxtSw ? "bold" : "normal",
+                    marginLeft: -2,
+                    color: "white",
+                  }}
+                >
+                  Text
+                </Typography>
+              </Box>
+            )}
+            {isSmallScreen && <Box sx={{ flexGrow: 1 }} />}
+            <Button><SendIcon/></Button>
           </Stack>
         </Stack>
 
