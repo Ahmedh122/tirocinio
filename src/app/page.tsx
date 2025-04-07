@@ -1,15 +1,14 @@
 import { useState } from 'react'
-
 import { Box, Tab, Tabs } from '@mui/material';
-import FornitoriTable from './Tables/FornitoriTable';
-import DestinazioniTable from './Tables/DestinazioniTable'
+import FornitoriTable from './components/tables/FornitoriTable';
+import DestinazioniTable from './components/tables/DestinazioniTable';
 function Home() {
 
   const [activeTab, setActiveTab] = useState(0);
 
     
        
-
+ 
   return (
     <><Box sx={{height:'100%' , width:'100%'}}>
       <Tabs
@@ -34,4 +33,4 @@ function Home() {
   )
 }
 
-export default Home
+export {Home as Component};

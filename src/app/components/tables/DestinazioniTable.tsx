@@ -11,50 +11,64 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-
   Typography,
 } from "@mui/material";
 import Paper from "@mui/material/Paper";
 
-
-
-
-const FornitoriTable = ()=> {
+const DestinazioniTable = () => {
   const navigate = useNavigate();
 
   const documenti = [
     {
       id: "1",
-      nome: "RelazioneAnnuale2024.pdf",
+      nome: "destRelazioneAnnuale2024.pdf",
     },
     {
       id: "2",
-      nome: "PreventivoQ1.pdf",
+      nome: "destPreventivoQ1.pdf",
     },
     {
       id: "3",
-      nome: "NoteRiunione.pdf",
+      nome: "destNoteRiunione.pdf",
     },
-    
-    {
-      id: "3",
-      nome: "NoteRiunione.pdf",
-    },
-
     {
       id: "4",
-      nome: "ContrattoFornitore.pdf",
+      nome: "destContrattoFornitore.pdf",
+    },
+    {
+      id: "2",
+      nome: "destPreventivoQ1.pdf",
+    },
+    {
+      id: "3",
+      nome: "destNoteRiunione.pdf",
+    },
+    {
+      id: "4",
+      nome: "destContrattoFornitore.pdf",
+    },
+    {
+      id: "2",
+      nome: "destPreventivoQ1.pdf",
+    },
+    {
+      id: "3",
+      nome: "destNoteRiunione.pdf",
+    },
+    {
+      id: "4",
+      nome: "destContrattoFornitore.pdf",
     },
     {
       id: "5",
-      nome: "PianoMarketing.pdf",
+      nome: "destPianoMarketing.pdf",
     },
   ];
 
-
-  const handleRowClick = (id: string) => {
-    navigate(`/document/${id}`);
-  };
+ const type: string = "pdf";
+ const handleRowClick = (id: string) => {
+   navigate(`/documents/${type}/${id}`);
+ };
 
   return (
     <Box sx={{ display: "flex", justifyContent: "center", marginTop: 2 }}>
@@ -62,15 +76,8 @@ const FornitoriTable = ()=> {
         component={Paper}
         sx={{ width: "90%", maxHeight: "90vh" }}
       >
-        <Table stickyHeader={true} >
-          <TableHead
-            sx={{
-              position: "sticky",
-              top: 0,
-              backgroundColor: "background.paper", // Ensure header is on top of the scrollable body
-              zIndex: 1,
-            }}
-          >
+        <Table stickyHeader={true}>
+          <TableHead>
             <TableRow>
               <TableCell sx={{ width: "20%" }}>Codice</TableCell>
               <TableCell sx={{ width: "60%" }}>Nome</TableCell>
@@ -79,9 +86,7 @@ const FornitoriTable = ()=> {
               </TableCell>
             </TableRow>
           </TableHead>
-          <TableBody
-            
-          >
+          <TableBody>
             {documenti.length === 0 ? (
               <TableRow>
                 <TableCell align="center">
@@ -94,14 +99,7 @@ const FornitoriTable = ()=> {
                       height: "100px",
                     }}
                   >
-                    <Typography
-                      sx={{
-                        color: "grey.500",
-                        fontStyle: "italic",
-                      }}
-                    >
-                      Nessun Documento
-                    </Typography>
+                    <Typography>Nessun Documento</Typography>
                   </Box>
                 </TableCell>
               </TableRow>
@@ -135,6 +133,7 @@ const FornitoriTable = ()=> {
                       sx={{
                         display: "flex",
                         alignItems: "center",
+                        maxWidth: "90%",
                       }}
                     >
                       <Typography
@@ -182,4 +181,4 @@ const FornitoriTable = ()=> {
   );
 };
 
-export default FornitoriTable;
+export default DestinazioniTable;

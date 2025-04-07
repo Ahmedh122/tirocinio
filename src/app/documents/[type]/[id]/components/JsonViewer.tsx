@@ -8,7 +8,7 @@ const JsonViewer = ({ data }: { data: any }) => {
       variant="outlined"
       sx={{
         width: "100%",
-        height: "95%", 
+        height: "95%",
         padding: 1,
         display: "flex",
         flexDirection: "column",
@@ -18,8 +18,8 @@ const JsonViewer = ({ data }: { data: any }) => {
       <Box
         sx={{
           width: "100%",
-          height: "95%", 
-          overflow: "auto", 
+          height: "95%",
+          overflow: "auto",
         }}
       >
         <JsonEditor
@@ -29,7 +29,6 @@ const JsonViewer = ({ data }: { data: any }) => {
           searchDebounceTime={300}
           restrictEdit={false}
           showErrorMessages={true}
-        
         />
       </Box>
     </Paper>

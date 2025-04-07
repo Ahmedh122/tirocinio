@@ -11,13 +11,19 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import JsonViewer from "./JsonViewer"; // Assuming you have a JsonViewer component
-import { DocumentViewer } from "./DocumentViewer";
-import TextViewer from "./TextViewer"; // Assuming you have DocumentViewer component
+import JsonViewer from "./components/JsonViewer"; // Assuming you have a JsonViewer component
+import { DocumentViewer } from "./components/DocumentViewer";
+//import { getDocumentViewerTemplate } from "./get-document-viewer-template";
+import TextViewer from "./components/TextViewer"; // Assuming you have DocumentViewer component
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import SendIcon from "@mui/icons-material/Send";
-import { useLocation, useNavigate } from "react-router-dom";
-import { useState } from "react";
+//import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+//import { getFileTypeOptions } from "../../lib/@tanstack/react-query/queries/get-file-type-options";
+//import { getFileOptions } from "../../lib/@tanstack/react-query/queries/get-file-options";
+//import { useQuery } from "@tanstack/react-query";
+//import { FormProvider, get, useForm } from "react-hook-form";
 
 const data = {
   pdf: {
@@ -65,17 +71,108 @@ const data = {
 
 function Document() {
   const navigate = useNavigate();
-  const documentId = useLocation().pathname.split("/")[2];
-  const [docTxtSw, setDocTxtSw] = useState(false);
+  //const documentId = useLocation().pathname.split("/")[2];
+  const [docTxtSw, setDocTxtSw] = useState(() => {
+    const saved = sessionStorage.getItem("docTxtSw");
+    return saved ? JSON.parse(saved) : false;
+  });
+
+  {
+    /**const getFileQuery = useQuery(
+    getFileOptions(documentId, {
+      select(data) {
+        return {
+          _id: data._id,
+          filename: data.pdf.originalname,
+          pdf: data.pdf.buffer,
+          result: data.result,
+          type_id: data.type_id,
+          status: data.status,
+        };
+      },
+    }),
+  );
+
+
+   
+
+  
+  
+  function getFileExtension(
+  filename: string
+): "pdf" | "docx" | "xlsx" | "xls" | undefined {
+  const extension = filename.split(".").pop()?.toLowerCase();
+  if (
+    extension === "pdf" ||
+    extension === "docx" ||
+    extension === "xlsx" ||
+    extension === "xls"
+  ) {
+    return extension;
+  }
+  return undefined;
+}
+ 
+ const {
+   data: fileData,
+   isPending: isFilePending,
+   isError: isFileError,
+ } = getFileQuery;
+
+const fileExtension = getFileExtension(fileData?.filename ?? "");
+
+  const location = useLocation();
+
+  const fileTypeId = location.state.fileTypeId;
+
+  const getFileTypeQuery = useQuery(
+    getFileTypeOptions(fileTypeId, {
+      select(data) {
+        const fileType = get(data, "model", {});
+        return fileType;
+      },
+    })
+  );
+
+  const {
+    data: fileTypeData,
+    isPending: isFileTypePending,
+    isError: isFileTypeError,
+  } = getFileTypeQuery;
+ */
+  }
+
+  useEffect(() => {
+    sessionStorage.setItem("docTxtSw", JSON.stringify(docTxtSw));
+  }, [docTxtSw]);
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("md"));
 
-  const handleSwitchChange = (event:Event) => {
+  const handleSwitchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setDocTxtSw(event.target.checked);
-   
   };
 
+  useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      const navEntries = performance.getEntriesByType(
+        "navigation"
+      ) as PerformanceNavigationTiming[];
+      const isRefresh = navEntries[0]?.type === "reload";
+
+      if (!isRefresh) {
+        localStorage.removeItem("docTxtSw");
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, []);
   return (
+    <>
     <Box
       sx={{
         height: "95%",
@@ -186,7 +283,9 @@ function Document() {
               </Box>
             )}
             {isSmallScreen && <Box sx={{ flexGrow: 1 }} />}
-            <Button><SendIcon/></Button>
+            <Button>
+              <SendIcon />
+            </Button>
           </Stack>
         </Stack>
 
@@ -219,12 +318,21 @@ function Document() {
             {docTxtSw ? (
               <TextViewer text={data.text} />
             ) : (
-              <DocumentViewer url="/DDT_12929_2024.pdf" extension="pdf" />
+              <>
+                {/**{
+                  fileData?.pdf && ( <DocumentViewer
+                 url={`data:application/pdf;base64,${fileData.pdf}`}
+                 extension={fileExtension}
+               />)
+                } */}
+                <DocumentViewer url="/DDT_12929_2024.pdf" extension="pdf" />
+              </>
             )}
           </Grid>
         </Grid>
       </Stack>
     </Box>
+    </>
   );
 }
-export default Document;
+export {Document as Component};

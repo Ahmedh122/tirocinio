@@ -1,15 +1,10 @@
-
-
 import DeleteIcon from "@mui/icons-material/Delete";
 import CircleIcon from "@mui/icons-material/Circle";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import { useNavigate } from "react-router-dom";
 import {
- 
   Box,
-
   IconButton,
- 
   Table,
   TableBody,
   TableCell,
@@ -21,58 +16,44 @@ import {
 } from "@mui/material";
 import Paper from "@mui/material/Paper";
 
-const DestinazioniTable = () => {
+
+
+
+const FornitoriTable = ()=> {
   const navigate = useNavigate();
 
   const documenti = [
     {
       id: "1",
-      nome: "destRelazioneAnnuale2024.pdf",
+      nome: "RelazioneAnnuale2024.pdf",
     },
     {
       id: "2",
-      nome: "destPreventivoQ1.pdf",
+      nome: "PreventivoQ1.pdf",
     },
     {
       id: "3",
-      nome: "destNoteRiunione.pdf",
+      nome: "NoteRiunione.pdf",
     },
-    {
-      id: "4",
-      nome: "destContrattoFornitore.pdf",
-    },
-    {
-      id: "2",
-      nome: "destPreventivoQ1.pdf",
-    },
+    
     {
       id: "3",
-      nome: "destNoteRiunione.pdf",
+      nome: "NoteRiunione.pdf",
     },
+
     {
       id: "4",
-      nome: "destContrattoFornitore.pdf",
-    },
-    {
-      id: "2",
-      nome: "destPreventivoQ1.pdf",
-    },
-    {
-      id: "3",
-      nome: "destNoteRiunione.pdf",
-    },
-    {
-      id: "4",
-      nome: "destContrattoFornitore.pdf",
+      nome: "ContrattoFornitore.pdf",
     },
     {
       id: "5",
-      nome: "destPianoMarketing.pdf",
+      nome: "PianoMarketing.pdf",
     },
   ];
 
-  const handleRowClick = (id:string) => {
-    navigate(`/document/${id}`);
+ const type:string = 'pdf'
+  const handleRowClick = (id: string) => {
+    navigate(`/documents/${type}/${id}`);
   };
 
   return (
@@ -81,8 +62,15 @@ const DestinazioniTable = () => {
         component={Paper}
         sx={{ width: "90%", maxHeight: "90vh" }}
       >
-        <Table stickyHeader={true}>
-          <TableHead>
+        <Table stickyHeader={true} >
+          <TableHead
+            sx={{
+              position: "sticky",
+              top: 0,
+              backgroundColor: "background.paper", // Ensure header is on top of the scrollable body
+              zIndex: 1,
+            }}
+          >
             <TableRow>
               <TableCell sx={{ width: "20%" }}>Codice</TableCell>
               <TableCell sx={{ width: "60%" }}>Nome</TableCell>
@@ -91,7 +79,9 @@ const DestinazioniTable = () => {
               </TableCell>
             </TableRow>
           </TableHead>
-          <TableBody>
+          <TableBody
+            
+          >
             {documenti.length === 0 ? (
               <TableRow>
                 <TableCell align="center">
@@ -105,7 +95,10 @@ const DestinazioniTable = () => {
                     }}
                   >
                     <Typography
-                      
+                      sx={{
+                        color: "grey.500",
+                        fontStyle: "italic",
+                      }}
                     >
                       Nessun Documento
                     </Typography>
@@ -142,7 +135,6 @@ const DestinazioniTable = () => {
                       sx={{
                         display: "flex",
                         alignItems: "center",
-                        maxWidth: "90%",
                       }}
                     >
                       <Typography
@@ -190,4 +182,4 @@ const DestinazioniTable = () => {
   );
 };
 
-export default DestinazioniTable;
+export default FornitoriTable;
