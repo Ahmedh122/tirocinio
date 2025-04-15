@@ -1,4 +1,4 @@
-import type { FileType } from "./File-type";
+import type { FileType } from "./file-type";
 import type { Result } from "./result";
 
 export type ApiFile = {
@@ -7,7 +7,7 @@ export type ApiFile = {
   file_name: string;
   type_id: string;
   status: string;
-  pdf:{
+  pdf?:{
     fieldname: string;
     originalname: string;
     encoding: string;
