@@ -7,7 +7,7 @@ import {
   useTheme,
 } from "@mui/material";
 import { useState, useEffect } from "react";
-import { useContainerSize } from "../_hooks/useContainerSize";
+
 import { ExcelViewer } from "./excel-viewer";
 import { WordViewer } from "./word-viewer";
 
@@ -18,7 +18,7 @@ interface DocumentViewerProps {
 
 export function DocumentViewer({ url, extension }: DocumentViewerProps) {
   const theme = useTheme();
-  const { ref: containerRef } = useContainerSize<HTMLDivElement>();
+
   const [binaryData, setBinaryData] = useState<ArrayBuffer | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -144,7 +144,7 @@ export function DocumentViewer({ url, extension }: DocumentViewerProps) {
 
   return (
     <Paper
-      ref={containerRef}
+     
       variant="outlined"
       sx={{
         width: "100%",

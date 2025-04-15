@@ -1,7 +1,6 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { DocumentInputType } from "../../app/documents/[type]/[id]/data/document-input";
-import type { Query } from './query';
-import type { QueryTrace } from './query-trace';
+
+import type { Query } from "./query";
+import  type { QueryTrace } from "./query-trace";
 
 export type FileType = {
   _id: string;
@@ -12,18 +11,18 @@ export type FileType = {
   tracciato?: QueryTrace;
   query?: Query;
   groups?: string[];
-  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   edited?: Record<string, any>;
   priority?: number;
   model: {
-    Intestazioni: {
+    intestazioni: {
       [key: string]: {
         nome: string;
-        campi: [DocumentInputType];
+        campi: [{ [key: string]: string | boolean | number }];
       };
     };
     table: {
-      columns: [DocumentInputType];
+      columns: [{ [key: string]: string | boolean | number }];
     };
   };
   image?: {

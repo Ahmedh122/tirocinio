@@ -17,13 +17,9 @@ import { DocumentViewer } from "./components/DocumentViewer";
 import TextViewer from "./components/TextViewer"; // Assuming you have DocumentViewer component
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import SendIcon from "@mui/icons-material/Send";
-//import { useLocation, useNavigate } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-//import { getFileTypeOptions } from "../../lib/@tanstack/react-query/queries/get-file-type-options";
-//import { getFileOptions } from "../../lib/@tanstack/react-query/queries/get-file-options";
-//import { useQuery } from "@tanstack/react-query";
-//import { FormProvider, get, useForm } from "react-hook-form";
+
 
 const data = {
   pdf: {
@@ -77,70 +73,7 @@ function Document() {
     return saved ? JSON.parse(saved) : false;
   });
 
-  {
-    /**const getFileQuery = useQuery(
-    getFileOptions(documentId, {
-      select(data) {
-        return {
-          _id: data._id,
-          filename: data.pdf.originalname,
-          pdf: data.pdf.buffer,
-          result: data.result,
-          type_id: data.type_id,
-          status: data.status,
-        };
-      },
-    }),
-  );
 
-
-   
-
-  
-  
-  function getFileExtension(
-  filename: string
-): "pdf" | "docx" | "xlsx" | "xls" | undefined {
-  const extension = filename.split(".").pop()?.toLowerCase();
-  if (
-    extension === "pdf" ||
-    extension === "docx" ||
-    extension === "xlsx" ||
-    extension === "xls"
-  ) {
-    return extension;
-  }
-  return undefined;
-}
- 
- const {
-   data: fileData,
-   isPending: isFilePending,
-   isError: isFileError,
- } = getFileQuery;
-
-const fileExtension = getFileExtension(fileData?.filename ?? "");
-
-  const location = useLocation();
-
-  const fileTypeId = location.state.fileTypeId;
-
-  const getFileTypeQuery = useQuery(
-    getFileTypeOptions(fileTypeId, {
-      select(data) {
-        const fileType = get(data, "model", {});
-        return fileType;
-      },
-    })
-  );
-
-  const {
-    data: fileTypeData,
-    isPending: isFileTypePending,
-    isError: isFileTypeError,
-  } = getFileTypeQuery;
- */
-  }
 
   useEffect(() => {
     sessionStorage.setItem("docTxtSw", JSON.stringify(docTxtSw));
@@ -233,6 +166,7 @@ const fileExtension = getFileExtension(fileData?.filename ?? "");
                   backgroundColor: "#1976d2",
                   paddingX: 2,
                   borderRadius: 4,
+                  width:200
                 }}
               >
                 <Typography

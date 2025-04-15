@@ -1,5 +1,5 @@
 export type Query ={
-    _id?: string;
+    _id: string;
     name?: string;
     text?: string;
     provider?: string;

@@ -2,9 +2,8 @@ export type Result = {
   CAMPI: {
     [key: string]: string;
   };
-  TABELLA: [
-    {
-      [Key: string]: string;
-    }
-  ];
+  INFORMAZIONI: {
+    [key: string]: string;
+  };
+  TABELLA: [{ [key: string]: string },];
 };
