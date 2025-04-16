@@ -15,49 +15,18 @@ import { AddListDialog } from "../../components/utils/add-list-dialog";
 import { SimpleTreeView, TreeItem2 } from "@mui/x-tree-view";
 import { bindMenu, bindTrigger } from "material-ui-popup-state/hooks";
 import { useNavigate } from "react-router";
+import { useQuery } from "@tanstack/react-query";
+import { getListsOptions } from "../../../lib/@tanstack/react-query/queries/get-lists";
 
-const data = [
-  {
-    id: 1,
-    nome: "List1",
-  },
-  {
-    id: 2,
-    nome: "List2",
-  },
-  {
-    id: 3,
-    nome: "List3",
-  },
-  {
-    id: 4,
-    nome: "List4",
-  },
-  {
-    id: 5,
-    nome: "6",
-  },
-  {
-    id: 7,
-    nome: "7",
-  },
-  {
-    id: 8,
-    nome: "8",
-  },
-  {
-    id: 9,
-    nome: "9",
-  },
-  {
-    id: 10,
-    nome: "10",
-  },
-];
+
+
+
+
 
 export function Sidebar() {
   const navigate = useNavigate();
-
+  const {data } = useQuery(getListsOptions());
+  console.log('lists' , data);
   const [selectedItemId, setSelectedItemId] = useState<string>(() => {
     return sessionStorage.getItem("selectedItemId") || "";
   });
@@ -171,13 +140,13 @@ export function Sidebar() {
           <Divider/>
           
 
-          {data.map((list, index) => (
-            <React.Fragment key={list.id}>
+          {data?.map((list, index) => (
+            <React.Fragment key={list._id}>
               <TreeItem2
-                itemId={list.id.toString()}
+                itemId={list._id.toString()}
                 sx={{
                   backgroundColor:
-                    selectedItemId === list.id.toString()
+                    selectedItemId === list._id.toString()
                       ? "rgba(25, 118, 210, 0.2)"
                       : "transparent",
                 }}
@@ -194,15 +163,15 @@ export function Sidebar() {
                       paddingInline: 2,
                     }}
                     onClick={() => {
-                      setSelectedItemId(list.id.toString());
+                      setSelectedItemId(list._id.toString());
                       sessionStorage.setItem(
                         "selectedItemId",
-                        list.id.toString()
+                        list._id.toString()
                       );
-                      navigate(`/List/${list.nome}/${list.id}`);
+                      navigate(`/List/${list.name}/${list._id}`);
                     }}
                   >
-                    <Typography>{list.nome}</Typography>
+                    <Typography>{list.name}</Typography>
                     <PopupStateProvider variant="popover">
                       {({ popupState: menuPopupState }) => (
                         <>
@@ -276,7 +245,7 @@ export function Sidebar() {
                   },
                 }}
               />
-              {index < data.length - 1 && <Divider />}
+              {index < data?.length - 1 && <Divider />}
             </React.Fragment>
           ))}
         </SimpleTreeView>

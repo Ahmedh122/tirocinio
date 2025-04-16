@@ -3,19 +3,20 @@ import type { Result } from "./result";
 
 export type ApiFile = {
   _id: string;
-  type: FileType;
-  file_name: string;
+  type?: FileType;
+  uploaded:string,
+  file_name?: string;
   type_id: string;
   status: string;
-  pdf?:{
-    fieldname: string;
-    originalname: string;
-    encoding: string;
-    mimetype: string;
+  pdf:{
+    fieldname?: string;
+    originalname?: string;
+    encoding?: string;
+    mimetype?: string;
     buffer?: string;
-    size: number;
+    size?: number;
   };
-  result: Result; 
+  result?: Result; 
    
 };
  //

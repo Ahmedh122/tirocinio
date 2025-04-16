@@ -6,7 +6,7 @@ import {
 
   Typography,
 } from "@mui/material";
-import { orange, red, green } from "@mui/material/colors";
+import { orange, red, green, blue , purple} from "@mui/material/colors";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import Paper from "@mui/material/Paper";
 import { useState } from "react";
@@ -14,6 +14,8 @@ import { CustomPagination } from "./utils/CustomPagination";
 import FormatListBulletedAddIcon from "@mui/icons-material/FormatListBulletedAdd";
 
 import SendIcon from "@mui/icons-material/Send";
+import { useQuery } from "@tanstack/react-query";
+import { getFilesOptions } from "../../../../lib/@tanstack/react-query/queries/get-files";
 
 
 
@@ -21,78 +23,63 @@ const ListaPrincipale = ()=> {
   const navigate = useNavigate();
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [selectedFileIds, setSelectedFileIds] = useState<string[]>([]);
-    const [currentPage, setCurrentPage] = useState<number>(0);
-    const [rowsPerPage, setRowsPerPage] = useState<number>(5);
+    const [currentPage, setCurrentPage] = useState<number>(() => {
+      const saved = sessionStorage.getItem("currentPageListaPrincipale");
+      return saved !== null ? Number(saved) : 0;
+    });
+    
+    const [rowsPerPage, setRowsPerPage] = useState<number>(() => {
+      const saved = sessionStorage.getItem("rowsPerPageListaPrincipale");
+      return saved !== null ? Number(saved) : 10;
+    });
+  
+   
+    const { data, refetch } = useQuery(getFilesOptions( {
+     
+      page: currentPage+ 1,
+      limit: rowsPerPage,
+      //sort: sorting.field,
+      //sortMethod: sorting.order,
+      //q: globalFilter || undefined,
+      /*search: columnFilters
+        .filter((filter) => filter.id !== 'status' && filter.value)
+        .reduce(
+          (acc, filter) => ({
+            // biome-ignore lint/performance/noAccumulatingSpread: <explanation>
+            ...acc,
+            [filter.id]: filter.value,
+          }),
+          {},
+        ),
+      status:
+        columnFilters.find((filter: { id: string }) => filter.id === 'status')?.value &&
+        Array.isArray(
+          columnFilters.find((filter: { id: string }) => filter.id === 'status')?.value,
+        )
+          ? (
+              columnFilters.find((filter: { id: string }) => filter.id === 'status')
+                ?.value as string[]
+            ).map((status: string) => {
+              const reverseStatusMap: Record<string, string> = {
+                'IN ATTESA': 'PENDING',
+                'IN ELABORAZIONE': 'IN PROGRESS',
+                'INCOMPLETO': 'INCOMPLETED',
+                'COMPLETO': 'COMPLETED',
+                'ESPORTATO': 'EXPORTED',
+                'ERRORE': 'ERROR',
+              };
+              return reverseStatusMap[status] || status;
+            })
+          : undefined,
+    */}));
+  
+   console.log('currentPage', currentPage +1);
+   console.log('rowsPerPage', rowsPerPage);
+   console.log('data', data);
+  
     
   
    
-  
-  
-    const data = {
-      content: [
-        {
-          id: "1",
-          nome: "RelazioneAnnuale2024.pdf",
-          stato: "pending",
-        },
-        {
-          id: "2",
-          nome: "PreventivoQ1.pdf",
-          stato: "unprocessed",
-        },
-        {
-          id: "3",
-          nome: "NoteRiunione.pdf",
-          stato: "processed",
-        },
-        {
-          id: "4",
-          nome: "RelazioneAnnuale2024.pdf",
-          stato: "pending",
-        },
-        {
-          id: "5",
-          nome: "NoteRiunione.pdf",
-          stato: "processed",
-        },
-        {
-          id: "6",
-          nome: "RelazioneAnnuale2024.pdf",
-          stato: "pending",
-        },
-        {
-          id: "7",
-          nome: "PreventivoQ1.pdf",
-          stato: "unprocessed",
-        },
-        {
-          id: "8",
-          nome: "NoteRiunione.pdf",
-          stato: "processed",
-        },
-        {
-          id: "9",
-          nome: "PreventivoQ1.pdf",
-          stato: "unprocessed",
-        },
-        {
-          id: "10",
-          nome: "NoteRiunione.pdf",
-          stato: "processed",
-        },
-      ],
-      totalItems: 8,
-      totalpages: Math.ceil(8 / rowsPerPage),
-    };
-  
-    
-  
-    
-  
-    const type: string = "pdf";
-    const handleRowClick = (id: string) => {
-      navigate(`/documents/${type}/${id}`);
-    };
   
     const columns: GridColDef[] = [
       {
@@ -102,15 +89,21 @@ const ListaPrincipale = ()=> {
           let backgroundColor;
   
           switch (params.value) {
-            case "pending":
+            case "PENDING":
               backgroundColor = orange.A400;
               break;
-            case "unprocessed":
+            case "DEBUG":
               backgroundColor = red.A400;
               break;
-            case "processed":
+            case "INCOMPLETED":
+                backgroundColor =purple.A700 ;
+                break;
+            case "EXPORTED":
               backgroundColor = green.A700;
               break;
+            case "IN PROGRESS": 
+                backgroundColor = blue.A700;
+                break;
             default:
               backgroundColor = "white";
               break;
@@ -233,12 +226,12 @@ const ListaPrincipale = ()=> {
           },
     ];
   
-    const rows = data.content.map((documento) => ({
-      id: documento.id,
-      Nome: documento.nome,
-      Stato: documento.stato,
-      Azioni: documento.id,
-    }));
+    const rows = data?.content?.map((documento) => ({
+      id: documento._id,
+      Nome: documento.pdf.originalname,
+      Stato: documento.status,
+      Azioni: documento._id,
+    })) || [];
   
     
   
@@ -271,10 +264,8 @@ const ListaPrincipale = ()=> {
             rows={rows}
             columns={columns}
             paginationModel={{ page: currentPage, pageSize: rowsPerPage }}
-            onPaginationModelChange={(model) => {
-              setCurrentPage(model.page);
-              setRowsPerPage(model.pageSize);
-            }}
+            paginationMode="server" 
+            rowCount={data?.totalItems ?? 0}
             checkboxSelection
             disableRowSelectionOnClick
             onRowSelectionModelChange={(newSelection) => {
@@ -288,18 +279,22 @@ const ListaPrincipale = ()=> {
               ) {
                 return;
               }
-              handleRowClick(params.id as string);
+              const fileId = params.row.id;  
+              navigate(`/documents/pdf/${fileId}`);
             }}
+            
             slots={{
               pagination: () => (
                 <CustomPagination
                   page={currentPage}
-                  totalPages={data.totalpages}
-                  totalItems={data.totalItems}
+                  totalPages={data?.totalPages ?? 0}
+                  totalItems={data?.totalItems ?? 0}
                   rowsPerPage={rowsPerPage}
                   pageSizeOptions={pageSizeOptions}
                   onPageChange={setCurrentPage}
                   onRowsPerPageChange={setRowsPerPage}
+                  refetch={refetch}
+                  ListId="ListaPrincipale"
                 />
               ),
             }}

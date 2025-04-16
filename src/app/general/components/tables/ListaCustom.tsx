@@ -1,9 +1,9 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Box, Button, Typography } from "@mui/material";
 import { orange, red, green } from "@mui/material/colors";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import Paper from "@mui/material/Paper";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CustomPagination } from "./utils/CustomPagination";
 import FormatListBulletedAddIcon from "@mui/icons-material/FormatListBulletedAdd";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -11,10 +11,21 @@ import SendIcon from "@mui/icons-material/Send";
 
 const ListaCustom = () => {
   const navigate = useNavigate();
+  const { id } = useParams();
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [selectedFileIds, setSelectedFileIds] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(0);
-  const [rowsPerPage, setRowsPerPage] = useState<number>(5);
+  const [rowsPerPage, setRowsPerPage] = useState<number>(10);
+
+  useEffect(() => {
+    if (id) {
+      const savedPage = sessionStorage.getItem(`currentPage${id}`);
+      const savedRows = sessionStorage.getItem(`rowsPerPage${id}`);
+
+      setCurrentPage(savedPage !== null ? Number(savedPage) : 0);
+      setRowsPerPage(savedRows !== null ? Number(savedRows) : 10);
+    }
+  }, [id]);
 
   const data = {
     content: [
@@ -135,7 +146,7 @@ const ListaCustom = () => {
       },
     ],
     totalItems: 23,
-    totalpages: Math.ceil(23 / rowsPerPage),
+    totalPages: Math.ceil(23 / rowsPerPage),
   };
 
   const type: string = "pdf";
@@ -342,13 +353,15 @@ const ListaCustom = () => {
           slots={{
             pagination: () => (
               <CustomPagination
-                page={currentPage}
-                totalPages={data.totalpages}
-                totalItems={data.totalItems}
-                rowsPerPage={rowsPerPage}
-                pageSizeOptions={pageSizeOptions}
-                onPageChange={setCurrentPage}
-                onRowsPerPageChange={setRowsPerPage}
+              page={currentPage}
+              totalPages={data?.totalPages ?? 0}
+              totalItems={data?.totalItems ?? 0}
+              rowsPerPage={rowsPerPage}
+              pageSizeOptions={pageSizeOptions}
+              onPageChange={setCurrentPage}
+              onRowsPerPageChange={setRowsPerPage}
+              refetch={()=>{}}
+              ListId={id}
               />
             ),
           }}

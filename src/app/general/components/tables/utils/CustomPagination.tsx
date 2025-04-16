@@ -7,7 +7,6 @@ import {
   SelectChangeEvent,
   Stack,
 } from "@mui/material";
-import { QueryClient } from "@tanstack/react-query";
 
 type CustomPaginationProps = {
   page: number;
@@ -17,6 +16,8 @@ type CustomPaginationProps = {
   pageSizeOptions: number[];
   onPageChange: (value: number) => void;
   onRowsPerPageChange: (value: number) => void;
+  refetch: () => void;
+  ListId: string | undefined;
 };
 
 export const CustomPagination = ({
@@ -27,27 +28,23 @@ export const CustomPagination = ({
   pageSizeOptions,
   onPageChange,
   onRowsPerPageChange,
+  refetch,
+  ListId,
 }: CustomPaginationProps) => {
 
-const queryClient = new QueryClient();
-
-  const handlePageChange = async (
-    _event: React.ChangeEvent<unknown>,
-    value: number
-  ) => {
-    onPageChange(value - 1);await queryClient.refetchQueries({
-      queryKey: ["files"],
-      type: "active",
-      exact: true,
-    });
+  const handlePageChange = async (_event: React.ChangeEvent<unknown>, value: number) => {
+    _event.preventDefault();
+    const newPage = value - 1; // Subtract 1 because page 1 is index 0 in React state
+    onPageChange(newPage);
+    sessionStorage.setItem(`currentPage${ListId}`, newPage.toString());
+    refetch();  // Refetch data after page change
   };
-
+  
   const handleRowsPerPageChange = async (event: SelectChangeEvent<number>) => {
-    onRowsPerPageChange(Number(event.target.value)); await queryClient.refetchQueries({
-      queryKey: ['files'],
-      type: "active",
-      exact: true,
-    });
+    const newRowsPerPage = Number(event.target.value);
+    onRowsPerPageChange(newRowsPerPage);
+    sessionStorage.setItem(`newRowsPerPage${ListId}`, newRowsPerPage.toString());
+    refetch();  // Refetch data after rows per page change
   };
 
   return (

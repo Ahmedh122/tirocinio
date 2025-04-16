@@ -11,63 +11,33 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import JsonViewer from "./components/JsonViewer"; // Assuming you have a JsonViewer component
+import JsonViewer from "./components/JsonViewer"; 
 import { DocumentViewer } from "./components/DocumentViewer";
-//import { getDocumentViewerTemplate } from "./get-document-viewer-template";
-import TextViewer from "./components/TextViewer"; // Assuming you have DocumentViewer component
+import TextViewer from "./components/TextViewer"; 
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import SendIcon from "@mui/icons-material/Send";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams  } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { getFileOptions } from "../../../../lib/@tanstack/react-query/queries/get-single-file";
 
 
-const data = {
-  pdf: {
-    fieldname: "file",
-    originalname: "SLASER24_24091308135.pdf",
-    encoding: "7bit",
-    mimetype: "application/pdf",
-    buffer: "8yruhfiubdjvhsdjhvbsdfjhvbsdfjhvbhjsdfbvjhsdfbvjhfsdbvk",
-    size: 110763,
-  },
-  id: 1,
-  text: "a string, in which case it is interpreted as the colour (or background colour in the case of container and inputHighlight) a full CSS style object for fine-grained definition. You only need to provide properties you wish to override — all unspecified ones will fallback to either the default theme, or another theme that you specify as th which is a function that takes the same input as Filter Functions, but returns a CSS style object (or null). This allows you to dynamically change styling of various elements based on content or structure. (An example is in the Demata set, where the character names are styled larger than other string values) an array containing any combination of the above, in which case they are merged together. For example, you could provide a Theme Function with styling for a very specific condition, but the styles whenever the function returns null. (In the array, the later items have higher precedence) For a simple example, if you want to us theme, but just change a couple of small things, you'd specify something like this:a string, in which case it is interpreted as the colour (or background colour in the case of container and inputHighlight) a full CSS style object for fine-grained definition. You only need to provide properties you wish to override — all unspecified ones will fallback to either the default theme, or another theme that you specify  which is a function that takes the same input as Filter Functions, but returns a CSS style object (or null). This allows you to dynamically change styling of various elements based on content or structure. (An example is in the De data set, where the character names are styled larger than other string values) an array containing any combination of the above, in which case they are merged together. For example, you could provide a Theme Function with styling for a very specific condition, but then provide styles whenever the function returns null. (In the array, the later items have higher precedence) For a simple example, if you want to use the  theme, but just change a couple of small things, you'd specify something like this:a string, in which case it is interpreted as the colour (or background colour in the case of container and inputHighlight) a full CSS style object for fine-grained definition. You only need to provide properties you wish to override — all unspecified ones will fallback to either the default theme, or another theme that you s which is a function that takes the same input as Filter Functions, but returns a CSS style object (or null). This allows you to dynamically change styling of various elements based on content or structure. (An example is in the Demo  data set, where the character names are styled larger than other string values) an array containing any combination of the above, in which case they are merged together. For example, you could provide a Theme Function with styling for a very specific condition, but then provide  styles whenever the function returns null. (In the array, the later items have higher precedence) For a simple example, if you want to use the  theme, but just change a couple of small things, you'd specify something like this:",
-  result: {
-    CAMPI: {
-      Fornitore: "AZIENDA AGRICOLA BORTOLOTTI MARCO",
-      Destinatario: "DE LUCA & CAMPITIELLO SRL",
-      "Indirizzo Destinazione": "Via Paolo Canali n.16 40127 BOLOGNA",
-      "Numero Doc Trasporto": "2",
-    },
-    INFORMAZIONI: {
-      "Data Doc Trasporto": "09/09/2021",
-      "Numero Ordine Cliente": "SN/MAIL",
-      "Data Ordine Cliente": "09/09/2021",
-      "Data consegna cliente": "09/09/2021",
-      "Codice Fornitore": "06028",
-      "Codice Destinazione": "A0031601",
-      Filler: "",
-    },
-    TABELLA: [
-      {
-        "Codice Articolo del Fornitore": "ZUCCHINE VERDI IN LEGNO",
-        "Descrizione Articolo": "ZUCCHINE VERDI IN LEGNO",
-        "Colli consegnati": 56,
-        Quantita: 56,
-        "Kg Netti Consegnati": 448.8,
-        "Pezzi Consegnati": 0,
-        Importo: 448.8,
-        "Codice iva": "",
-        "Codice Sconto": "",
-        id: 0,
-      },
-    ],
-  },
+type RouteParams = {
+  nome: string;
+  id: string;
 };
 
+
 function Document() {
+  const { id } = useParams<RouteParams>();
+  
+
+  const {data} = useQuery({
+    ...getFileOptions(id ?? ''),
+    enabled: !!id,
+
+  });
   const navigate = useNavigate();
-  //const documentId = useLocation().pathname.split("/")[2];
   const [docTxtSw, setDocTxtSw] = useState(() => {
     const saved = sessionStorage.getItem("docTxtSw");
     return saved ? JSON.parse(saved) : false;
@@ -87,7 +57,7 @@ function Document() {
 
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+    const handleBeforeUnload = (_e: BeforeUnloadEvent) => {
       const navEntries = performance.getEntriesByType(
         "navigation"
       ) as PerformanceNavigationTiming[];
@@ -104,6 +74,14 @@ function Document() {
       window.removeEventListener("beforeunload", handleBeforeUnload);
     };
   }, []);
+
+
+
+
+  const base64 = data?.pdf.buffer;
+  const pdfUrl = `data:application/pdf;base64,${base64}`;
+
+
   return (
     <>
     <Box
@@ -147,7 +125,7 @@ function Document() {
                 fontStyle: "italic",
               }}
             >
-              {data.pdf.originalname}
+              {data?.pdf.originalname}
             </Typography>
           </Box>
           <Stack
@@ -238,7 +216,7 @@ function Document() {
             size={{ xs: 12, lg: 6 }}
             spacing={2}
           >
-            <JsonViewer data={data.result} />
+            <JsonViewer data={data?.result} />
           </Grid>
 
           <Grid
@@ -250,16 +228,16 @@ function Document() {
             size={{ xs: 12, lg: 6 }}
           >
             {docTxtSw ? (
-              <TextViewer text={data.text} />
+              <TextViewer text={'da aggiungere il testo'} />
             ) : (
               <>
-                {/**{
-                  fileData?.pdf && ( <DocumentViewer
-                 url={`data:application/pdf;base64,${fileData.pdf}`}
-                 extension={fileExtension}
+                {
+                  data?.pdf && ( <DocumentViewer
+                 url={pdfUrl}
+                 extension={"pdf"}
                />)
-                } */}
-                <DocumentViewer url="/DDT_12929_2024.pdf" extension="pdf" />
+                }
+                
               </>
             )}
           </Grid>
