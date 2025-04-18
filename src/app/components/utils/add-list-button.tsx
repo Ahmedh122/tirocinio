@@ -13,9 +13,11 @@ export function AddListButton() {
     <>
       <Button
         size="small"
-        startIcon={<AddRoundedIcon />}
+        startIcon={<AddRoundedIcon sx={{ position: "relative", top: "-1px" }}/>}
         {...bindTrigger(popupState)}
         sx={{
+          display:'flex',
+          textAlign:'start',
           backgroundColor: "transparent",
           color: "primary.main",
           "&:hover": {
@@ -23,8 +25,9 @@ export function AddListButton() {
             color: "darkblue",
           },
         }}
+
       >
-        Add list
+        Nuova lista
       </Button>
     </>
   );

@@ -81,6 +81,14 @@ function Document() {
   const base64 = data?.pdf.buffer;
   const pdfUrl = `data:application/pdf;base64,${base64}`;
 
+  const allowedExtensions = ["pdf", "docx", "xlsx", "doc", "xls"] as const;
+    const ext = data?.pdf.originalname?.split('.').pop()?.toLowerCase() ||'pdf';
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const extension = allowedExtensions.includes(ext as any)
+  ? (ext as typeof allowedExtensions[number])
+  : undefined;
+
+
 
   return (
     <>
@@ -234,7 +242,7 @@ function Document() {
                 {
                   data?.pdf && ( <DocumentViewer
                  url={pdfUrl}
-                 extension={"pdf"}
+                 extension={extension}
                />)
                 }
                 

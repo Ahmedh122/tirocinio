@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { Box, Button, Typography } from "@mui/material";
-import { orange, red, green } from "@mui/material/colors";
+import { orange, red, green, purple, blue, yellow } from "@mui/material/colors";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import Paper from "@mui/material/Paper";
 import { useEffect, useState } from "react";
@@ -8,6 +8,9 @@ import { CustomPagination } from "./utils/CustomPagination";
 import FormatListBulletedAddIcon from "@mui/icons-material/FormatListBulletedAdd";
 import DeleteIcon from "@mui/icons-material/Delete";
 import SendIcon from "@mui/icons-material/Send";
+import {  useQuery } from "@tanstack/react-query";
+import { getListOptions } from "../../../../lib/@tanstack/react-query/queries/get-single-list";
+import { useDeleteFileList } from "../../../../lib/@tanstack/react-query/mutations/delete-file-from-list-mutation";
 
 const ListaCustom = () => {
   const navigate = useNavigate();
@@ -27,132 +30,16 @@ const ListaCustom = () => {
     }
   }, [id]);
 
-  const data = {
-    content: [
-      {
-        id: "1",
-        nome: "RelazioneAnnuale2024.pdf",
-        stato: "pending",
-      },
-      {
-        id: "2",
-        nome: "PreventivoQ1.pdf",
-        stato: "unprocessed",
-      },
-      {
-        id: "3",
-        nome: "NoteRiunione.pdf",
-        stato: "processed",
-      },
-      {
-        id: "4",
-        nome: "RelazioneAnnuale2024.pdf",
-        stato: "pending",
-      },
-      {
-        id: "5",
-        nome: "NoteRiunione.pdf",
-        stato: "processed",
-      },
-      {
-        id: "6",
-        nome: "RelazioneAnnuale2024.pdf",
-        stato: "pending",
-      },
-      {
-        id: "7",
-        nome: "PreventivoQ1.pdf",
-        stato: "unprocessed",
-      },
-      {
-        id: "8",
-        nome: "NoteRiunione.pdf",
-        stato: "processed",
-      },
-      {
-        id: "9",
-        nome: "PreventivoQ1.pdf",
-        stato: "unprocessed",
-      },
-      {
-        id: "10",
-        nome: "NoteRiunione.pdf",
-        stato: "processed",
-      },
-      {
-        id: "11",
-        nome: "NoteRiunione.pdf",
-        stato: "processed",
-      },
-      {
-        id: "12",
-        nome: "NoteRiunione.pdf",
-        stato: "processed",
-      },
-      {
-        id: "13",
-        nome: "NoteRiunione.pdf",
-        stato: "processed",
-      },
-      {
-        id: "14",
-        nome: "NoteRiunione.pdf",
-        stato: "processed",
-      },
-      {
-        id: "15",
-        nome: "NoteRiunione.pdf",
-        stato: "processed",
-      },
-      {
-        id: "16",
-        nome: "NoteRiunione.pdf",
-        stato: "processed",
-      },
-      {
-        id: "17",
-        nome: "NoteRiunione.pdf",
-        stato: "processed",
-      },
-      {
-        id: "18",
-        nome: "NoteRiunione.pdf",
-        stato: "processed",
-      },
-      {
-        id: "19",
-        nome: "NoteRiunione.pdf",
-        stato: "processed",
-      },
-      {
-        id: "20",
-        nome: "NoteRiunione.pdf",
-        stato: "processed",
-      },
-      {
-        id: "21",
-        nome: "NoteRiunione.pdf",
-        stato: "processed",
-      },
-      {
-        id: "12",
-        nome: "NoteRiunione.pdf",
-        stato: "processed",
-      },
-      {
-        id: "23",
-        nome: "Notawdfwdawd.pdf",
-        stato: "processed",
-      },
-    ],
-    totalItems: 23,
-    totalPages: Math.ceil(23 / rowsPerPage),
-  };
+  const { data, refetch} = useQuery({
+    ...getListOptions({ id: id ?? "", page: currentPage + 1, limit: rowsPerPage }),
+    enabled: !!id,
+    
+  });
 
-  const type: string = "pdf";
-  const handleRowClick = (id: string) => {
-    navigate(`/documents/${type}/${id}`);
-  };
+ const deleteFile = useDeleteFileList(id ?? '',{onSuccess:()=>{refetch()}}) ;
+  
+
+  
 
   const columns: GridColDef[] = [
     {
@@ -162,14 +49,23 @@ const ListaCustom = () => {
         let backgroundColor;
 
         switch (params.value) {
-          case "pending":
+          case "PENDING":
             backgroundColor = orange.A400;
             break;
-          case "unprocessed":
-            backgroundColor = red.A400;
+          case "DEBUG":
+            backgroundColor = yellow.A400;
             break;
-          case "processed":
+          case "INCOMPLETED":
+            backgroundColor = purple.A700;
+            break;
+          case "EXPORTED":
             backgroundColor = green.A700;
+            break;
+          case "IN PROGRESS":
+            backgroundColor = blue.A700;
+            break;
+          case "ERROR":
+            backgroundColor = red.A700;
             break;
           default:
             backgroundColor = "white";
@@ -247,14 +143,13 @@ const ListaCustom = () => {
       sortable: false,
       filterable: false,
       headerAlign: "center",
-      renderCell: (/*params*/) => {
+      renderCell: (params) => {
         return (
           <Box
             display="flex"
             alignItems="center"
-            justifyContent='center'
+            justifyContent="center"
             sx={{ height: "100%", width: "100wh" }}
-          
           >
             <Button
               variant="text"
@@ -276,6 +171,7 @@ const ListaCustom = () => {
               variant="text"
               onClick={(event) => {
                 event.stopPropagation();
+                deleteFile.mutate({ fileIds: [params.value] })
               }}
               sx={{
                 "& svg": {
@@ -286,7 +182,7 @@ const ListaCustom = () => {
                 },
               }}
             >
-              <DeleteIcon />
+              <DeleteIcon  />
             </Button>
             <Button
               variant="text"
@@ -310,11 +206,11 @@ const ListaCustom = () => {
     },
   ];
 
-  const rows = data.content.map((documento) => ({
-    id: documento.id,
-    Nome: documento.nome,
-    Stato: documento.stato,
-    Azioni: documento.id,
+  const rows = data?.content.map((documento) => ({
+    id: documento._id,
+    Nome: documento.pdf.originalname,
+    Stato: documento.status,
+    Azioni: documento._id,
   }));
 
   const pageSizeOptions = [5, 10];
@@ -329,14 +225,12 @@ const ListaCustom = () => {
       }}
     >
       <Paper sx={{ width: "90%", maxHeight: "90vh" }}>
-        <DataGrid
+      <DataGrid
           rows={rows}
           columns={columns}
           paginationModel={{ page: currentPage, pageSize: rowsPerPage }}
-          onPaginationModelChange={(model) => {
-            setCurrentPage(model.page);
-            setRowsPerPage(model.pageSize);
-          }}
+          paginationMode="server"
+          rowCount={data?.totalItems ?? 0}
           checkboxSelection
           disableRowSelectionOnClick
           onRowSelectionModelChange={(newSelection) => {
@@ -348,20 +242,21 @@ const ListaCustom = () => {
             ) {
               return;
             }
-            handleRowClick(params.id as string);
+            const fileId = params.row.id;
+            navigate(`/documents/pdf/${fileId}`);
           }}
           slots={{
             pagination: () => (
               <CustomPagination
-              page={currentPage}
-              totalPages={data?.totalPages ?? 0}
-              totalItems={data?.totalItems ?? 0}
-              rowsPerPage={rowsPerPage}
-              pageSizeOptions={pageSizeOptions}
-              onPageChange={setCurrentPage}
-              onRowsPerPageChange={setRowsPerPage}
-              refetch={()=>{}}
-              ListId={id}
+                page={currentPage}
+                totalPages={data?.totalPages ?? 0}
+                totalItems={data?.totalItems ?? 0}
+                rowsPerPage={rowsPerPage}
+                pageSizeOptions={pageSizeOptions}
+                onPageChange={setCurrentPage}
+                onRowsPerPageChange={setRowsPerPage}
+                refetch={refetch}
+                ListId={id}
               />
             ),
           }}
@@ -381,7 +276,6 @@ const ListaCustom = () => {
           }}
         />
       </Paper>
-     
     </Box>
   );
 };

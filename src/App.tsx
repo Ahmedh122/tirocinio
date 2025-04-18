@@ -7,17 +7,25 @@ import { themeOptions } from "./lib/@mui/theme-options";
 import { Suspense } from "react";
 import { GlobalSpinner } from "./components/spinners/global-spinner";
 import { StrictMode } from "react";
-
+import { SnackbarProvider } from "notistack";
 
 export function App() {
   return(
     <StrictMode>
       <QueryClientProvider client={queryClient}>
+      <SnackbarProvider
+          maxSnack={3}
+          anchorOrigin={{ vertical: "top", horizontal: "center" }}
+          autoHideDuration={3000}
+          preventDuplicate
+        >
         <ThemeProvider themeOptions={themeOptions}>
            <Suspense fallback={<GlobalSpinner />}>
          <RouterProvider/>
+        
          </Suspense>
         </ThemeProvider>
+        </SnackbarProvider>
       </QueryClientProvider >
     </StrictMode>
   )

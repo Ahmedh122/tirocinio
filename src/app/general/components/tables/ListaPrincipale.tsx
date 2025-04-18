@@ -1,42 +1,36 @@
 import { useNavigate } from "react-router-dom";
-import {
-  Box,
-
-  Button,
-
-  Typography,
-} from "@mui/material";
-import { orange, red, green, blue , purple} from "@mui/material/colors";
+import { Box, Button, Stack, Typography } from "@mui/material";
+import { orange, red, green, blue, purple,} from "@mui/material/colors";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import Paper from "@mui/material/Paper";
 import { useState } from "react";
+import {  bindTrigger } from "material-ui-popup-state/hooks";
 import { CustomPagination } from "./utils/CustomPagination";
 import FormatListBulletedAddIcon from "@mui/icons-material/FormatListBulletedAdd";
-
+import SavedSearchIcon from "@mui/icons-material/SavedSearch";
 import SendIcon from "@mui/icons-material/Send";
 import { useQuery } from "@tanstack/react-query";
 import { getFilesOptions } from "../../../../lib/@tanstack/react-query/queries/get-files";
+import { PopupStateProvider } from "../../../../providers/popup/PopupStateProvider";
+import { AddFilesToListMenu } from "../../../components/utils/add-files-to-list-dialog";
 
-
-
-const ListaPrincipale = ()=> {
+const ListaPrincipale = () => {
   const navigate = useNavigate();
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const [selectedFileIds, setSelectedFileIds] = useState<string[]>([]);
-    const [currentPage, setCurrentPage] = useState<number>(() => {
-      const saved = sessionStorage.getItem("currentPageListaPrincipale");
-      return saved !== null ? Number(saved) : 0;
-    });
-    
-    const [rowsPerPage, setRowsPerPage] = useState<number>(() => {
-      const saved = sessionStorage.getItem("rowsPerPageListaPrincipale");
-      return saved !== null ? Number(saved) : 10;
-    });
-  
-   
-    const { data, refetch } = useQuery(getFilesOptions( {
-     
-      page: currentPage+ 1,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [selectedFileIds, setSelectedFileIds] = useState<string[]>([]);
+  const [currentPage, setCurrentPage] = useState<number>(() => {
+    const saved = sessionStorage.getItem("currentPageListaPrincipale");
+    return saved !== null ? Number(saved) : 0;
+  });
+
+  const [rowsPerPage, setRowsPerPage] = useState<number>(() => {
+    const saved = sessionStorage.getItem("rowsPerPageListaPrincipale");
+    return saved !== null ? Number(saved) : 10;
+  });
+
+  const { data, refetch } = useQuery(
+    getFilesOptions({
+      page: currentPage + 1,
       limit: rowsPerPage,
       //sort: sorting.field,
       //sortMethod: sorting.order,
@@ -71,85 +65,83 @@ const ListaPrincipale = ()=> {
               return reverseStatusMap[status] || status;
             })
           : undefined,
-    */}));
-  
-   console.log('currentPage', currentPage +1);
-   console.log('rowsPerPage', rowsPerPage);
-   console.log('data', data);
-  
-    
-  
-   
-  
-    const columns: GridColDef[] = [
-      {
-        field: "Stato",
-        headerName: "Stato",
-        renderCell: (params) => {
-          let backgroundColor;
-  
-          switch (params.value) {
-            case "PENDING":
-              backgroundColor = orange.A400;
-              break;
-            case "DEBUG":
-              backgroundColor = red.A400;
-              break;
-            case "INCOMPLETED":
-                backgroundColor =purple.A700 ;
-                break;
-            case "EXPORTED":
-              backgroundColor = green.A700;
-              break;
-            case "IN PROGRESS": 
-                backgroundColor = blue.A700;
-                break;
-            default:
-              backgroundColor = "white";
-              break;
-          }
-          return (
+    */
+    })
+  );
+
+  console.log("currentPage", currentPage + 1);
+  console.log("rowsPerPage", rowsPerPage);
+  console.log("data", data);
+
+  const columns: GridColDef[] = [
+    {
+      field: "Stato",
+      headerName: "Stato",
+      renderCell: (params) => {
+        let backgroundColor;
+
+        switch (params.value) {
+          case "PENDING":
+            backgroundColor = orange.A400;
+            break;
+          case "DEBUG":
+            backgroundColor = red.A400;
+            break;
+          case "INCOMPLETED":
+            backgroundColor = purple.A700;
+            break;
+          case "EXPORTED":
+            backgroundColor = green.A700;
+            break;
+          case "IN PROGRESS":
+            backgroundColor = blue.A700;
+            break;
+          default:
+            backgroundColor = "white";
+            break;
+        }
+        return (
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              height: "100%",
+            }}
+          >
             <Box
               sx={{
+                backgroundColor,
+                padding: 1,
+                height: "4vh",
+                borderRadius: "50px 50px",
                 display: "flex",
                 alignItems: "center",
-                height: "100%",
+                justifyContent: "center",
               }}
             >
-              <Box
+              <Typography
+                variant="body2"
                 sx={{
-                  backgroundColor,
-                  padding: 1,
-                  height: "4vh",
-                  borderRadius: "50px 50px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                
+                  fontWeight: "bold",
+                  color: "white",
+                  textAlign: "center",
                 }}
               >
-                <Typography
-                  variant="body2"
-                  sx={{
-                    fontWeight: "bold",
-                    color: "white",
-                    textAlign: "center",
-                  }}
-                >
-                  {params.value}
-                </Typography>
-              </Box>
+                {params.value}
+              </Typography>
             </Box>
-          );
-        },
-        width: 200,
-        sortable: false,
+          </Box>
+        );
       },
-  
-      {
-        field: "Nome",
-        headerName: "Nome file",
-        renderCell: (params)=>{return (
+      flex: 2,
+      sortable: false,
+    },
+
+    {
+      field: "Nome",
+      headerName: "Nome file",
+      renderCell: (params) => {
+        return (
           <Box
             sx={{
               display: "flex",
@@ -166,156 +158,253 @@ const ListaPrincipale = ()=> {
               {params.value}
             </Typography>
           </Box>
-        );},
-        description: "This column has a value getter and is not sortable.",
-        sortable: false,
-        width: 550,
+        );
       },
-      {
-            field: "Azioni",
-            headerName: "Azioni",
-            width: 200,
-            sortable: false,
-            filterable: false,
-            headerAlign: "center",
-            renderCell: (/*params*/) => {
-              return (
-                <Box
-                  display="flex"
-                  alignItems="center"
-                  justifyContent='center'
-                  sx={{ height: "100%", width: "100wh" }}
-                
-                >
-                  <Button
-                    variant="text"
-                    onClick={(event) => {
-                      event.stopPropagation();
-                    }}
-                    sx={{
-                      "& svg": {
-                        color: "grey",
-                      },
-                      "&:hover svg": {
-                        color: "orange",
-                      },
-                    }}
-                  >
-                    <FormatListBulletedAddIcon />
-                  </Button>
-                  
-                  <Button
-                    variant="text"
-                    onClick={(event) => {
-                      event.stopPropagation();
-                    }}
-                    sx={{
-                      "& svg": {
-                        color: "grey",
-                      },
-                      "&:hover svg": {
-                        color: "#1976d2",
-                      },
-                    }}
-                  >
-                    <SendIcon />
-                  </Button>
-                </Box>
-              );
-            },
-          },
-    ];
-  
-    const rows = data?.content?.map((documento) => ({
+      description: "This column has a value getter and is not sortable.",
+      sortable: false,
+      flex: 6.7,
+    },
+    {
+      field: "Azioni",
+      headerName: "Azioni",
+      flex: 3.3,
+      disableColumnMenu: true,
+      sortable: false,
+      filterable: false,
+      headerAlign: "center",
+      renderCell: (/*params*/) => {
+        return (
+          <Box
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+            gap={3}
+            sx={{ height: "100%", width: "100wh" }}
+          >
+            <Button
+              variant="text"
+              onClick={(event) => {
+                event.stopPropagation();
+              }}
+              sx={{
+                width: 35,
+                height: 35,
+                minWidth: 0,
+                borderRadius: "50%",
+                boxShadow: 3,
+                "& svg": {
+                  color: "grey",
+                },
+                "&:hover svg": {
+                  color: "orange",
+                },
+              }}
+            >
+              <FormatListBulletedAddIcon />
+            </Button>
+
+            <Button
+              variant="text"
+              onClick={(event) => {
+                event.stopPropagation();
+              }}
+              sx={{
+                width: 35,
+                height: 35,
+                minWidth: 0,
+                borderRadius: "50%",
+                boxShadow: 3,
+                "& svg": {
+                  color: "grey",
+                },
+                "&:hover svg": {
+                  color: "#1976d2",
+                },
+              }}
+            >
+              <SendIcon />
+            </Button>
+          </Box>
+        );
+      },
+    },
+  ];
+
+  const rows =
+    data?.content?.map((documento) => ({
       id: documento._id,
       Nome: documento.pdf.originalname,
       Stato: documento.status,
       Azioni: documento._id,
     })) || [];
-  
-    
-  
-    const pageSizeOptions = [5, 10];
-  
-    return (
+
+  const pageSizeOptions = [5, 10];
+
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        marginTop: 2,
+        padding: 1,
+      }}
+    >
       <Box
         sx={{
           display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          marginTop: 2,
-          padding: 1,
+          flexDirection: "row",
+          justifyContent: "space-between",
+
+          width: "89%",
+          marginBottom: 3,
         }}
       >
-        <Box
+        <Typography
+          variant="h3"
+          component="h1"
           sx={{
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "start",
-            width:'90%',
-            marginLeft:5,
-            marginBottom:3
+            color: "grey.700",
+            fontStyle: "italic",
           }}
         >
-          <Typography>Tutti i files</Typography>{" "}
-        </Box>
-        <Paper sx={{ width: "90%", maxHeight: "90vh" }}>
-          <DataGrid
-            rows={rows}
-            columns={columns}
-            paginationModel={{ page: currentPage, pageSize: rowsPerPage }}
-            paginationMode="server" 
-            rowCount={data?.totalItems ?? 0}
-            checkboxSelection
-            disableRowSelectionOnClick
-            onRowSelectionModelChange={(newSelection) => {
-              setSelectedFileIds(newSelection as string[]);
-            }}
-            onRowClick={(params, event) => {
-              if (
-                (event.target as HTMLElement).closest(
-                  ".MuiDataGrid-cellCheckbox"
-                )
-              ) {
-                return;
-              }
-              const fileId = params.row.id;  
-              navigate(`/documents/pdf/${fileId}`);
-            }}
-            
-            slots={{
-              pagination: () => (
-                <CustomPagination
-                  page={currentPage}
-                  totalPages={data?.totalPages ?? 0}
-                  totalItems={data?.totalItems ?? 0}
-                  rowsPerPage={rowsPerPage}
-                  pageSizeOptions={pageSizeOptions}
-                  onPageChange={setCurrentPage}
-                  onRowsPerPageChange={setRowsPerPage}
-                  refetch={refetch}
-                  ListId="ListaPrincipale"
-                />
-              ),
+          Tutti i files
+        </Typography>
+        <Stack
+          direction="row"
+          justifyContent="space-between"
+          gap={2}
+          marginRight={6}
+        >
+          <Button
+            variant="text"
+            onClick={(event) => {
+              event.stopPropagation();
             }}
             sx={{
-              border: 0,
-              "& .MuiDataGrid-cell:focus, & .MuiDataGrid-cell:focus-within": {
-                outline: "none",
+              width: 40,
+              height: 40,
+              minWidth: 0,
+              borderRadius: "50%",
+              boxShadow: 3,
+              "& svg": {
+                color: "grey",
               },
-              "& .MuiDataGrid-row.Mui-selected": {
-                outline: "none",
+              "&:hover svg": {
+                color: "blue",
               },
-              "& .MuiDataGrid-columnHeader:focus, & .MuiDataGrid-columnHeader:focus-within":
-                {
-                  outline: "none",
-                  boxShadow: "none",
-                },
             }}
-          />
-        </Paper>
+          >
+            <SavedSearchIcon />
+          </Button>{" "}
+          <PopupStateProvider variant="popover">
+            {({ popupState }) => (
+              <>
+                <Button
+                  {...bindTrigger(popupState)}
+                  variant="text"
+                  disabled={selectedFileIds.length === 0}
+                  sx={{
+                    width: 40,
+                    height: 40,
+                    minWidth: 0,
+                    borderRadius: "50%",
+                    boxShadow: 3,
+                    "& svg": {
+                      color: "grey",
+                    },
+                    "&:hover svg": {
+                      color: selectedFileIds.length > 0 ? "orange" : "grey",
+                    },
+                  }}
+                >
+                  <FormatListBulletedAddIcon />
+                </Button>
+
+                <AddFilesToListMenu
+                  popupState={popupState}
+                  fileIds={selectedFileIds}
+                />
+              </>
+            )}
+          </PopupStateProvider>
+          <Button
+            variant="text"
+            onClick={(event) => {
+              event.stopPropagation();
+            }}
+            sx={{
+              width: 40,
+              height: 40,
+              minWidth: 0,
+              borderRadius: "50%",
+              boxShadow: 3,
+              "& svg": {
+                color: "grey",
+              },
+              "&:hover svg": {
+                color: "#1976d2",
+              },
+            }}
+          >
+            <SendIcon />
+          </Button>
+        </Stack>
       </Box>
-    );
+      <Paper sx={{ width: "90%", maxHeight: "90vh" , boxShadow:4}}>
+        <DataGrid
+          rows={rows}
+          columns={columns}
+          paginationModel={{ page: currentPage, pageSize: rowsPerPage }}
+          paginationMode="server"
+          rowCount={data?.totalItems ?? 0}
+          checkboxSelection
+          disableRowSelectionOnClick
+          onRowSelectionModelChange={(newSelection) => {
+            setSelectedFileIds(newSelection as string[]);
+          }}
+          onRowClick={(params, event) => {
+            if (
+              (event.target as HTMLElement).closest(".MuiDataGrid-cellCheckbox")
+            ) {
+              return;
+            }
+            const fileId = params.row.id;
+            navigate(`/documents/pdf/${fileId}`);
+          }}
+          slots={{
+            pagination: () => (
+              <CustomPagination
+                page={currentPage}
+                totalPages={data?.totalPages ?? 0}
+                totalItems={data?.totalItems ?? 0}
+                rowsPerPage={rowsPerPage}
+                pageSizeOptions={pageSizeOptions}
+                onPageChange={setCurrentPage}
+                onRowsPerPageChange={setRowsPerPage}
+                refetch={refetch}
+                ListId="ListaPrincipale"
+              />
+            ),
+          }}
+          sx={{
+            border: 0,
+            "& .MuiDataGrid-cell:focus, & .MuiDataGrid-cell:focus-within": {
+              outline: "none",
+            },
+            "& .MuiDataGrid-row.Mui-selected": {
+              outline: "none",
+            },
+            "& .MuiDataGrid-columnHeader:focus, & .MuiDataGrid-columnHeader:focus-within":
+              {
+                outline: "none",
+                boxShadow: "none",
+              },
+          }}
+        />
+      </Paper>
+    </Box>
+  );
 };
 
-export {ListaPrincipale as Component} ;
+export { ListaPrincipale as Component };

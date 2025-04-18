@@ -7,13 +7,12 @@ import {
 } from "@tanstack/react-query";
 import { useSnackbar } from "notistack";
 
-import { ModifyListSchema } from "./modify-list-mutation";
 
-export type CreateListSchema = z.infer<ReturnType<typeof createListSchema>>;
+export type ModifyListSchema = z.infer<ReturnType<typeof modifyListSchema>>;
 
-export function createListSchema() {
+export function modifyListSchema() {
   return z.object({
-    name: z.string().min(4, "required").max(128, "too long"),
+    name: z.string().min(4, "required").max(128, "too long").optional(),
     fileIds: z.array(z.string()).optional(),
   });
 }
@@ -35,9 +34,14 @@ export interface ApiError {
 
 export type ApiErrorResponse = ApiError;
 
-export function useCreateList(
+export  function makeModListQueryKey(id:string) {
+  return ['modlist', {id}] as const;
+}
+
+export function useModifyList(
+    id: string,
   options?: Omit<
-    UseMutationOptions<ModifyListSchema, ApiErrorResponse, CreateListSchema>,
+    UseMutationOptions<ModifyListSchema, ApiErrorResponse, ModifyListSchema>,
     "mutationKey" | "mutationFn" 
   >
 ) {
@@ -46,12 +50,12 @@ export function useCreateList(
 
   return useMutation({
     ...options,
-    mutationKey: ["createList"],
+    mutationKey: makeModListQueryKey(id) ,
 
-    async mutationFn(data: CreateListSchema) {
+    async mutationFn(data: ModifyListSchema) {
       try {
         const response = await apiClient
-          .post("lists", {
+          .put(`lists/${id}`, {
             json: {
               name: data.name,
               fileIds: data.fileIds,
@@ -70,36 +74,18 @@ export function useCreateList(
       }
     },
 
-    //prova
-
     onSuccess(data, variables, context) {
       snackbar.enqueueSnackbar({
         variant: "success",
-        message: "List created successfully!",
+        message: "List modified successfully!",
       });
 
-      queryClient.invalidateQueries({ queryKey: ["lists"] });
+      queryClient.invalidateQueries({ queryKey: ["list", {id}] });
       options?.onSuccess?.(data, variables, context);
     },
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    onError(error: any) {
-      let errorMessage = "An unknown error occurred";
-    
-      console.error("Error response:", error);
-    
-      if (typeof error?.error === "string" && error.error.includes("E11000")) {
-        errorMessage =
-          "A list with this name already exists. Please choose a different name.";
-      } else if (typeof error?.message === "string") {
-        errorMessage = error.message;
-      }
-    
-      snackbar.enqueueSnackbar({
-        variant: "error",
-        message: errorMessage,
-      });
-    }
+   
+   
 
      
     
