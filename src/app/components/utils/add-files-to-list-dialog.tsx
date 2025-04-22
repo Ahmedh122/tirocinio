@@ -6,6 +6,7 @@ import {
   InputBase,
   Box,
   Popover,
+  
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import { styled } from "@mui/material/styles";
@@ -18,6 +19,7 @@ import { CustomScrollbar } from "./CustomScrollBar";
 import DoneIcon from "@mui/icons-material/Done";
 import ListIcon from "@mui/icons-material/List";
 import { useModifyList } from "../../../lib/@tanstack/react-query/mutations/modify-list-mutation";
+import AddRoundedIcon from "@mui/icons-material/AddRounded";
 
 const SearchIconWrapper = styled("div")(({ theme }) => ({
   padding: theme.spacing(0, 2),
@@ -31,7 +33,7 @@ const SearchIconWrapper = styled("div")(({ theme }) => ({
   },
 }));
 
-export const StyledInputBase = styled(InputBase)(({ theme }) => ({
+const StyledInputBase = styled(InputBase)(({ theme }) => ({
   color: "#ffffff",
   "& .MuiInputBase-input": {
     padding: theme.spacing(1, 1, 1, 0),
@@ -41,9 +43,9 @@ export const StyledInputBase = styled(InputBase)(({ theme }) => ({
     width: "100%",
     fontSize: "1.3rem",
     "&::placeholder": {
-      color: "#94a3b8", // light slate for placeholder
+      color: "#94a3b8", 
       opacity: 1,
-      fontSize: "1.3rem", // keep visible
+      fontSize: "1.3rem", 
     },
   },
 }));
@@ -59,6 +61,8 @@ export function AddFilesToListMenu({
   const [nomeLista, setNomeLista] = useState<string>("");
   const [idLista, setIdLista] = useState<string>("");
   const [search, setSearch] = useState("");
+  const [newList, setNewList ] = useState(false);
+  
 
   const creaLista = useCreateList({
     onSuccess: () => {
@@ -83,17 +87,42 @@ export function AddFilesToListMenu({
 
   return (
     <Popover
-      {...bindMenu(popupState)}
-      anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-      transformOrigin={{ vertical: "top", horizontal: "center" }}
-      disableAutoFocus
-      disableEnforceFocus
-      disableRestoreFocus
-      PaperProps={{
-        sx: {
-          minWidth: 350,
-          p: 2,
-        },
+  {...bindMenu(popupState)}
+  anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+  transformOrigin={{ vertical: "top", horizontal: "center" }}
+  PaperProps={{
+    sx: {
+      backgroundColor: "transparent",
+      boxShadow: "none",
+      overflow: "visible",
+      border: 'none'
+    },
+  }}
+>
+  <Box sx={{ position: "relative", mt: 2 }}>
+    {/* Arrow */}
+    <Box
+      sx={{
+        position: "absolute",
+        top: -10,
+        left: "calc(50% - 10px)",
+        width: 20,
+        height: 20,
+        backgroundColor: "white",
+        transform: "rotate(45deg)",
+        zIndex: 1,
+        
+      }}
+    />
+
+   
+    <Box
+      sx={{
+        p: 2,
+        borderRadius: 2,
+        backgroundColor: "white",
+        boxShadow: 3,
+        width: 350,
       }}
     >
       <Box
@@ -108,16 +137,7 @@ export function AddFilesToListMenu({
       </Box>
 
       <Stack spacing={2}>
-        <TextField
-          placeholder="Nome lista"
-          value={nomeLista}
-          onChange={(
-            event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-          ) => {
-            setNomeLista(event.target.value);
-            setIdLista("");
-          }}
-        />
+       
         <Stack>
           <Box
             sx={{
@@ -125,8 +145,8 @@ export function AddFilesToListMenu({
               borderTopLeftRadius: 7,
               borderTopRightRadius: 7,
               transition: "all 0.3s ease",
-              borderBottomLeftRadius: filteredLists && filteredLists.length ? 4 : 7 ,
-              borderBottomRightRadius: filteredLists && filteredLists.length ? 4 : 7 ,
+              borderBottomLeftRadius: filteredLists && filteredLists.length  && !newList ? 4 : 7 ,
+              borderBottomRightRadius: filteredLists && filteredLists.length && !newList  ? 4 : 7 ,
               boxShadow: 6,
               backgroundColor: "#1f2733",
               width: "98%",
@@ -147,13 +167,14 @@ export function AddFilesToListMenu({
                 setIdLista("");
               }}
               inputProps={{ "aria-label": "search" }}
+              onClick={()=>{setNewList(false)}}
             />
           </Box>
-          {filteredLists && filteredLists.length >0 && (
+          {filteredLists && filteredLists.length >0 && !newList &&(
           <CustomScrollbar height={400} dependency={filteredLists.length}>
             <Box
               sx={{
-                backgroundColor: "#334155", // darker slate blue-gray
+                backgroundColor: "#334155", 
                 color: "white",
                 py: 0.5,
                 transition: "all 1s ease"
@@ -170,10 +191,10 @@ export function AddFilesToListMenu({
                       px: 2,
                       borderRadius: 1,
                       backgroundColor:
-                        idLista === list._id ? "#1e293b" : "transparent", // selected is slightly brighter now
+                        idLista === list._id ? "#1e293b" : "transparent", 
                       transition: "background-color 0.2s ease",
                       "&:hover": {
-                        backgroundColor: "#475569", // a mid-tone hover, less harsh
+                        backgroundColor: "#475569", 
                         cursor: "pointer",
                       },
                     }}
@@ -212,7 +233,7 @@ export function AddFilesToListMenu({
                           position: "absolute",
                           right: 35,
                           "& svg": {
-                            color: "#1e293b", // match container background
+                            color: "#1e293b", 
                           },
                         }}
                       >
@@ -225,7 +246,34 @@ export function AddFilesToListMenu({
             </Box>
           </CustomScrollbar>)}
         </Stack>
-
+        <Stack spacing={1}>
+          <Button  size="small"
+        startIcon={<AddRoundedIcon sx={{ position: "relative", top: "-1px" }}/>}
+        
+        sx={{
+          display:'flex',
+          textAlign:'start',
+          backgroundColor: "transparent",
+          justifyContent: 'start',
+          color: "primary.main",
+          "&:hover": {
+            backgroundColor: "transparent",
+            color: "darkblue",
+          },
+        }}
+        onClick={()=>{setNewList(!newList)}}
+        >Crea nuova lista</Button>
+        {newList && (
+        <TextField
+          placeholder="Nome lista"
+          value={nomeLista}
+          onChange={(
+            event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+          ) => {
+            setNomeLista(event.target.value);
+            setIdLista("");
+          }}
+        />)}</Stack>
         <Button
           variant="contained"
           disabled={!(idLista || nomeLista)}
@@ -240,6 +288,9 @@ export function AddFilesToListMenu({
           Aggiungi
         </Button>
       </Stack>
-    </Popover>
+    </Box>
+  </Box>
+</Popover>
+  
   );
 }

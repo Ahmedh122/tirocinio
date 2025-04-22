@@ -10,25 +10,29 @@ export function AddListButton() {
 
    
   return (
-    <>
-      <Button
-        size="small"
-        startIcon={<AddRoundedIcon sx={{ position: "relative", top: "-1px" }}/>}
-        {...bindTrigger(popupState)}
-        sx={{
-          display:'flex',
-          textAlign:'start',
-          backgroundColor: "transparent",
-          color: "primary.main",
-          "&:hover": {
-            backgroundColor: "transparent",
-            color: "darkblue",
-          },
-        }}
-
-      >
-        Nuova lista
-      </Button>
-    </>
+    
+     <Button
+     variant="text"
+    
+  {...bindTrigger(popupState)}
+  sx={{
+    minWidth: 0,
+    height: 35,
+    width: 35,
+    borderRadius: "50%",
+    backgroundColor: "white",
+    "& svg": { 
+      color: "#1e293b",
+      fontSize: "24px" 
+    },
+    "&:hover": {
+      backgroundColor: "#e1e3e8",
+      color: "#141a21",
+    },
+  }}
+>
+  <AddRoundedIcon />
+</Button>
+    
   );
 }

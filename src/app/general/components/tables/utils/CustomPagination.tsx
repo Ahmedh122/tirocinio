@@ -54,6 +54,7 @@ export const CustomPagination = ({
       alignItems="center"
       padding={1}
       width="100%"
+      sx={{backgroundColor: '#141a21'}}
     >
       <Box display="flex" alignItems="center" padding={0}>
         <Typography variant="body1" marginLeft={1}>
@@ -94,6 +95,15 @@ export const CustomPagination = ({
           showLastButton
           siblingCount={1}
           boundaryCount={0}
+          sx={{
+            '& .MuiPaginationItem-root.Mui-selected': {
+              backgroundColor: 'white',
+              color: '#1976d2', // primary color text for contrast
+              '&:hover': {
+                backgroundColor: '#f0f0f0',
+              },
+            },
+          }}
         />
       </Box>
     </Box>

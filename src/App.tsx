@@ -19,7 +19,7 @@ export function App() {
           autoHideDuration={3000}
           preventDuplicate
         >
-        <ThemeProvider themeOptions={themeOptions}>
+        <ThemeProvider themeOptions={themeOptions } >
            <Suspense fallback={<GlobalSpinner />}>
          <RouterProvider/>
         

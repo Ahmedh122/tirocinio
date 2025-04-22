@@ -4,24 +4,32 @@ import { useEffect, useRef, useState } from "react";
 interface CustomScrollbarProps {
   children: React.ReactNode;
   height?: number | string;
+  width?: number | string;
+  marginLeft?: number | string;
   bgColor?: string;
   thumbColor?: string;
   hoverThumbColor?: string;
-  dependency?: unknown; // can be any changing prop
+  dependency?: unknown;
 }
 
 export const CustomScrollbar: React.FC<CustomScrollbarProps> = ({
   children,
   height,
+  width,
+  marginLeft,
   bgColor = "#475569",
   thumbColor = "#334155",
   hoverThumbColor = "#94a3b8",
-  dependency, // <- new
+  dependency,
 }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const thumbRef = useRef<HTMLDivElement>(null);
+
   const [thumbTop, setThumbTop] = useState(0);
   const [thumbHeight, setThumbHeight] = useState(40);
-
+  const [isDragging, setIsDragging] = useState(false);
+  const [startY, setStartY] = useState(0);
+  const [startTop, setStartTop] = useState(0);
   const [isOverflowing, setIsOverflowing] = useState(false);
 
   const updateThumbHeight = () => {
@@ -32,37 +40,61 @@ export const CustomScrollbar: React.FC<CustomScrollbarProps> = ({
     setThumbHeight(visibleRatio * el.clientHeight);
   };
 
- 
-
   const handleScroll = () => {
-    if (!scrollRef.current) return;
     const el = scrollRef.current;
+    if (!el) return;
     const ratio = el.scrollTop / (el.scrollHeight - el.clientHeight);
-    const newThumbTop = ratio * (el.clientHeight - thumbHeight);
-    setThumbTop(newThumbTop);
+    setThumbTop(ratio * (el.clientHeight - thumbHeight));
+  };
+
+  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    setIsDragging(true);
+    setStartY(e.clientY);
+    setStartTop(thumbTop);
+    e.preventDefault();
+  };
+
+  const handleMouseMove = (e: MouseEvent) => {
+    if (!isDragging || !scrollRef.current) return;
+    const deltaY = e.clientY - startY;
+    const el = scrollRef.current;
+    const scrollRatio =
+      (el.scrollHeight - el.clientHeight) / (el.clientHeight - thumbHeight);
+    el.scrollTop = (startTop + deltaY) * scrollRatio;
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
   };
 
   useEffect(() => {
+    updateThumbHeight();
+    handleScroll(); // initial sync
+
     const el = scrollRef.current;
     if (!el) return;
 
-    updateThumbHeight();
     el.addEventListener("scroll", handleScroll);
     window.addEventListener("resize", updateThumbHeight);
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", handleMouseUp);
 
     return () => {
       el.removeEventListener("scroll", handleScroll);
       window.removeEventListener("resize", updateThumbHeight);
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [thumbHeight]);
+  }, [thumbHeight, isDragging]);
 
-  // 👇 Recalculate when dependency changes
   useEffect(() => {
     updateThumbHeight();
   }, [dependency]);
 
   return (
-    <Box sx={{ position: "relative", width: "100%" }}>
+    <Box
+      sx={{ position: "relative", width: "100%", maxWidth: width, marginLeft }}
+    >
       <Box
         ref={scrollRef}
         sx={{
@@ -72,7 +104,6 @@ export const CustomScrollbar: React.FC<CustomScrollbarProps> = ({
           borderBottomRightRadius: 8,
           maxHeight: height,
           overflowY: "scroll",
-          transition: "all 1s ease",
           mr: "12px",
           scrollbarWidth: "none",
           "&::-webkit-scrollbar": { display: "none" },
@@ -84,22 +115,29 @@ export const CustomScrollbar: React.FC<CustomScrollbarProps> = ({
       <Box
         sx={{
           position: "absolute",
-          top: 0,
+          top: 10,
           right: 0,
           width: "8px",
-          height: "100%",
+          height: `calc(100% - 10px)`,
         }}
       >
         <Box
+          ref={thumbRef}
+          onMouseDown={handleMouseDown}
           sx={{
             position: "absolute",
-            top: `${thumbTop}px`,
+            // Constrain the thumb's top to ensure it stays within bounds
+            top: `${Math.min(
+              thumbTop + 10,
+              (scrollRef.current?.clientHeight || 0) - thumbHeight - 10
+            )}px`, // Account for the top offset and prevent overflow
             right: 0,
             width: "8px",
-            height: `${thumbHeight}px`,
+            height: `${thumbHeight -15}px`,
             backgroundColor: isOverflowing ? thumbColor : "transparent",
             borderRadius: "8px",
-            transition: "top 0.1s, background-color 0.3s ease",
+            cursor: "pointer",
+            transition: "background-color 0.3s ease",
             pointerEvents: "auto",
             "&:hover": {
               backgroundColor: isOverflowing ? hoverThumbColor : "transparent",

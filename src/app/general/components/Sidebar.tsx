@@ -1,255 +1,211 @@
 import MoreHorizRoundedIcon from "@mui/icons-material/MoreHorizRounded";
 import React, { useState } from "react";
-import {
-  Box,
-  Divider,
-  IconButton,
-  Menu,
-  Paper,
-  Stack,
-  Typography,
-} from "@mui/material";
+import { Box, Paper, Stack, Typography } from "@mui/material";
 import { PopupStateProvider } from "../../../providers/popup/PopupStateProvider"; // Ensure correct import
 import { AddListButton } from "../../components/utils/add-list-button";
 import { AddListDialog } from "../../components/utils/add-list-dialog";
-import { SimpleTreeView, TreeItem2 } from "@mui/x-tree-view";
-import { bindMenu, bindTrigger } from "material-ui-popup-state/hooks";
 import { useNavigate } from "react-router";
 import { useQuery } from "@tanstack/react-query";
 import { getListsOptions } from "../../../lib/@tanstack/react-query/queries/get-lists";
-
-
-
-
-
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faHouse, faBars } from "@fortawesome/free-solid-svg-icons";
+import { CustomScrollbar } from "../../components/utils/CustomScrollBar";
 
 export function Sidebar() {
   const navigate = useNavigate();
-  const {data } = useQuery(getListsOptions());
-  console.log('lists' , data);
+  const { data } = useQuery(getListsOptions());
+
   const [selectedItemId, setSelectedItemId] = useState<string>(() => {
-    return sessionStorage.getItem("selectedItemId") || "";
+    return sessionStorage.getItem("selectedItemId") || "Home";
   });
 
   return (
     <Paper
+  sx={{
+    overflow: "hidden",
+    marginTop: 0,
+    height: "96vh",
+    padding: 1.5,
+    boxShadow: 3,
+    backgroundColor: "#141a21",
+  }}
+>
+  <Stack direction="column" gap={2}>
+ 
+    <Stack
+      direction="row"
+      spacing={1}
+      justifyContent="flex-start"
+      alignItems={"center"}
+      height={60}
       sx={{
-        overflow: "hidden",
-        marginTop: 0,       
-        height: "96vh",
+        backgroundColor: "#1e293b",  
+        borderRadius: 2, 
+        paddingLeft: 2,  
+       
       }}
     >
-      <Box
-        sx={(theme) => ({
-          paddingBlock: 1.5,
-          paddingInline: "0px",
-          borderBottom: `1px solid ${theme.palette.grey[200]}`,
-        })}
+      <Typography
+        variant="h6"
+        sx={{
+          color: "#ffffff", 
+          fontWeight: 600,  
+          letterSpacing: 1.5, 
+        }}
       >
+        Training Tool
+      </Typography>
+    </Stack>
+
+    
+    <Stack
+      direction={"row"}
+      spacing={1}
+      justifyContent="flex-start"
+      paddingLeft={4}
+      alignItems={"center"}
+      height={60}
+      borderRadius={1}
+      sx={{
+        backgroundColor: selectedItemId === "Home" ? "#1e293b" : "#141a21",
+        transition: "background-color 0.2s ease",
+        "&:hover": {
+          backgroundColor: "#475569",
+        },
+      }}
+      onClick={() => {
+        sessionStorage.setItem("selectedItemId", "Home");
+        setSelectedItemId("Home");
+        navigate("/AllFiles");
+      }}
+    >
+      <FontAwesomeIcon
+        icon={faHouse}
+        size="lg"
+        style={{ color: "#ffffff" }}
+      />
+      <Typography sx={{ color: "white" }}>Tutti i files</Typography>
+    </Stack>
+
+   
+    <Stack direction={"column"} alignItems={"center"}>
+      <Stack
+        direction={"row"}
+        position={"relative"}
+        spacing={1}
+        justifyContent="flex-start"
+        paddingLeft={4}
+        alignItems={"center"}
+        height={60}
+        borderRadius={1}
+        sx={{
+          backgroundColor: "#1e293b",
+          width: "100%",
+          "& svg": {
+            color: "white",
+          },
+        }}
+      >
+        <FontAwesomeIcon
+          icon={faBars}
+          size="lg"
+          style={{ color: "#ffffff" }}
+        />
+        <Typography sx={{ color: "white" }}>Liste</Typography>
         <Stack
-          direction="row"
-          spacing={1}
-          justifyContent="flex-start"
-          height={40}
+          position={"absolute"}
+          alignItems={"center"}
+          justifyContent={"center"}
+          height={60}
+          right={15}
         >
           <PopupStateProvider variant="dialog">
             <AddListButton />
             <AddListDialog />
           </PopupStateProvider>
         </Stack>
+      </Stack>
 
-        <SimpleTreeView<false>
-          selectedItems={selectedItemId}
-          sx={{
-            overflow: "auto",
-            maxHeight: "calc(100vh - 95px)",
-            direction: "rtl", // This moves the scrollbar to the left
-            "&::-webkit-scrollbar": {
-              width: "8px", // Optional, adjust the width of the scrollbar
-            },
-            "&::-webkit-scrollbar-thumb": {
-              backgroundColor: "rgba(0, 0, 0, 0.3)", // Optional, scrollbar thumb style
-              borderRadius: "10px",
-            },
-          }}
+      {data && data.length > 0 && (
+        <CustomScrollbar
+          height={600}
+          dependency={data.length}
+          width={339}
+          marginLeft={1}
         >
-          <Divider />
-          <TreeItem2
-            itemId="lista-principale"
+          <Box
             sx={{
-              backgroundColor:
-                selectedItemId === "lista-principale"
-                  ? "rgba(25, 118, 210, 0.2)" // Slightly darker blue
-                  : "transparent",
+              backgroundColor: "#141a21",
+              color: "white",
+              py: 0.5,
+              transition: "all 1s ease",
             }}
-            label={
-              <Stack
-                spacing={2}
-                direction="row"
-                alignItems="center"
-                justifyContent="space-between"
-                sx={{
-                  direction: "ltr",
-                  cursor: "pointer", // show it's clickable
-                  paddingBlock: 1.5,
-                  paddingInline: 2,
-                }}
-                onClick={() => {
-                  setSelectedItemId("lista-principale");
-                  sessionStorage.setItem("selectedItemId", "lista-principale");
-                  navigate("/AllFiles");
-                }}
-              >
-                <Typography>Tutti i files</Typography>
-              </Stack>
-            }
-            slotProps={{
-              content: {
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-expect-error
-                // TODO: investigate
-                sx: {
-                  padding: 0,
-                  borderRadius: 0,
-                  "&.Mui-selected": {
-                    backgroundColor: "transparent",
-                  },
-                },
-              },
-              label: {
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-expect-error
-                // TODO: investigate
-                sx: {
-                  paddingBlock: 1.5,
-                  paddingInline: 2,
-                },
-              },
-              iconContainer: {
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-expect-error
-                // TODO: investigate
-                sx: {
-                  display: "none",
-                },
-              },
-            }}
-          />
-          <Divider />
-          <Typography sx={{direction:'ltr'}}>Liste:</Typography>
-          <Divider/>
-          
-
-          {data?.map((list, index) => (
-            <React.Fragment key={list._id}>
-              <TreeItem2
-                itemId={list._id.toString()}
-                sx={{
-                  backgroundColor:
-                    selectedItemId === list._id.toString()
-                      ? "rgba(25, 118, 210, 0.2)"
-                      : "transparent",
-                }}
-                label={
-                  <Stack
-                    spacing={2}
-                    direction="row"
-                    alignItems="center"
-                    justifyContent="space-between"
-                    sx={{
-                      direction: "ltr",
+          >
+            {data?.map((list) => (
+              <Box key={list._id} sx={{ px: 1, py: 0.5 }}>
+                <Stack
+                  direction="row"
+                  justifyContent="space-between"
+                  sx={{
+                    position: "relative",
+                    alignItems: "center",
+                    py: 3,
+                    px: 2,
+                    borderRadius: 1,
+                    backgroundColor:
+                      selectedItemId === list._id
+                        ? "#1e293b"
+                        : "transparent",
+                    color:
+                      selectedItemId === list._id ? "#1e293b" : "#334155",
+                    transition: "background-color 0.2s ease",
+                    "&:hover": {
+                      backgroundColor: "#475569",
+                      color: "#475569",
                       cursor: "pointer",
-                      paddingBlock: 1.5,
-                      paddingInline: 2,
-                    }}
-                    onClick={() => {
-                      setSelectedItemId(list._id.toString());
-                      sessionStorage.setItem(
-                        "selectedItemId",
-                        list._id.toString()
-                      );
-                      navigate(`/List/${list.name}/${list._id}`);
-                    }}
-                  >
-                    <Typography>{list.name}</Typography>
-                    <PopupStateProvider variant="popover">
-                      {({ popupState: menuPopupState }) => (
-                        <>
-                          <IconButton
-                            {...bindTrigger(menuPopupState)}
-                            onClick={(event) => {
-                              bindTrigger(menuPopupState).onClick(event);
-                              event.stopPropagation();
-                            }}
-                          >
-                            <MoreHorizRoundedIcon />
-                          </IconButton>
-                          <Menu
-                            {...bindMenu(menuPopupState)}
-                            anchorOrigin={{
-                              vertical: "bottom",
-                              horizontal: "center",
-                            }}
-                            transformOrigin={{
-                              vertical: "top",
-                              horizontal: "center",
-                            }}
-                            slotProps={{
-                              paper: {
-                                sx: {
-                                  minWidth: 150,
-                                },
-                              },
-                            }}
-                            onClick={(event) => {
-                              event.stopPropagation();
-                            }}
-                            disableAutoFocusItem
-                            autoFocus={false}
-                            disableAutoFocus
-                          />
-                        </>
-                      )}
-                    </PopupStateProvider>
+                    },
+                  }}
+                  onClick={() => {
+                    sessionStorage.setItem("selectedItemId", list._id);
+                    setSelectedItemId(list._id);
+                    navigate(`/List/${list.name}/${list._id}`);
+                  }}
+                >
+                  <Stack direction={"row"}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        width: 25,
+                        height: 25,
+                        backgroundColor: "#1DD760",
+                        borderRadius: "50%",
+                        marginRight: 2,
+                      }}
+                    >
+                      <Typography sx={{ fontWeight: 600 }}>
+                        {list.fileCount}
+                      </Typography>
+                    </Box>
+                    <Typography
+                      sx={{ color: "#e1e3e8", fontWeight: "bold", ml: 1 }}
+                    >
+                      {list.name}
+                    </Typography>
                   </Stack>
-                }
-                slotProps={{
-                  content: {
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    // @ts-expect-error
-                    // TODO: investigate
-                    sx: {
-                      padding: 0,
-                      borderRadius: 0,
-                      "&.Mui-selected": {
-                        backgroundColor: "transparent",
-                      },
-                    },
-                  },
-                  label: {
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    // @ts-expect-error
-                    // TODO: investigate
-                    sx: {
-                      paddingBlock: 1.5,
-                      paddingInline: 2,
-                    },
-                  },
-                  iconContainer: {
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    // @ts-expect-error
-                    // TODO: investigate
-                    sx: {
-                      display: "none",
-                    },
-                  },
-                }}
-              />
-              {index < data?.length - 1 && <Divider />}
-            </React.Fragment>
-          ))}
-        </SimpleTreeView>
-      </Box>
-    </Paper>
+                  <Box sx={{ color: "#e1e3e8", fontWeight: "bold", ml: 1 }}>
+                    <MoreHorizRoundedIcon />
+                  </Box>
+                </Stack>
+              </Box>
+            ))}
+          </Box>
+        </CustomScrollbar>
+      )}
+    </Stack>
+  </Stack>
+</Paper>
+
   );
 }
