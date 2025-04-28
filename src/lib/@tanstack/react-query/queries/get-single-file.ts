@@ -50,7 +50,7 @@ export async function getFiles({signal, id}:{signal?:AbortSignal, id: GetFilePar
               signal,
               id: id,
             });
-            console.log("optionsData", response);
+          
             return response;
           },
         });

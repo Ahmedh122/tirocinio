@@ -81,6 +81,7 @@ export function useModifyList(
       });
 
       queryClient.invalidateQueries({ queryKey: ["list", {id}] });
+      queryClient.invalidateQueries({queryKey: ["lists"]});
       options?.onSuccess?.(data, variables, context);
     },
 

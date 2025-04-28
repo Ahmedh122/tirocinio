@@ -1,12 +1,5 @@
-import {
-  Pagination,
-  Select,
-  MenuItem,
-  Box,
-  Typography,
-  SelectChangeEvent,
-  Stack,
-} from "@mui/material";
+
+import { Pagination, Select, MenuItem, Box, Typography, SelectChangeEvent, Stack } from "@mui/material";
 
 type CustomPaginationProps = {
   page: number;
@@ -31,42 +24,36 @@ export const CustomPagination = ({
   refetch,
   ListId,
 }: CustomPaginationProps) => {
-
+  
+  // Handle page change
   const handlePageChange = async (_event: React.ChangeEvent<unknown>, value: number) => {
-    _event.preventDefault();
+   
     const newPage = value - 1; // Subtract 1 because page 1 is index 0 in React state
     onPageChange(newPage);
     sessionStorage.setItem(`currentPage${ListId}`, newPage.toString());
-    refetch();  // Refetch data after page change
+    refetch();
+    console.log("aaaaaaaaaaa");
   };
   
+  // Handle rows per page change
   const handleRowsPerPageChange = async (event: SelectChangeEvent<number>) => {
     const newRowsPerPage = Number(event.target.value);
     onRowsPerPageChange(newRowsPerPage);
     sessionStorage.setItem(`newRowsPerPage${ListId}`, newRowsPerPage.toString());
-    refetch();  // Refetch data after rows per page change
+    refetch();
   };
 
+
+
+
   return (
-    <Box
-      display="flex"
-      justifyContent="space-between"
-      alignItems="center"
-      padding={1}
-      width="100%"
-      sx={{backgroundColor: '#141a21'}}
-    >
+    <Box display="flex" justifyContent="space-between" alignItems="center" padding={1} width="100%" sx={{backgroundColor: '#141a21'}}>
       <Box display="flex" alignItems="center" padding={0}>
         <Typography variant="body1" marginLeft={1}>
           Total Pages: {totalPages}{" "}
         </Typography>
       </Box>
-      <Box
-        display="flex"
-        justifyContent="space-between"
-        alignItems="center"
-        padding={0}
-      >
+      <Box display="flex" justifyContent="space-between" alignItems="center" padding={0}>
         <Typography variant="body1" marginRight={2}>
           Total Items: {totalItems}{" "}
         </Typography>
@@ -98,7 +85,7 @@ export const CustomPagination = ({
           sx={{
             '& .MuiPaginationItem-root.Mui-selected': {
               backgroundColor: 'white',
-              color: '#1976d2', // primary color text for contrast
+              color: '#1976d2', 
               '&:hover': {
                 backgroundColor: '#f0f0f0',
               },

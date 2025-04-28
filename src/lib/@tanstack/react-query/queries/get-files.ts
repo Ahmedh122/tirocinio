@@ -109,7 +109,7 @@ export async function getFiles({signal, searchParams}:{signal?:AbortSignal, sear
               signal,
               searchParams: params,
             });
-            console.log("optionsData", response);
+           
             return response;
           },
         });

@@ -27,7 +27,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import SendIcon from "@mui/icons-material/Send";
 import { useQuery } from "@tanstack/react-query";
 import { getListOptions } from "../../../../lib/@tanstack/react-query/queries/get-single-list";
-import { useDeleteFileList } from "../../../../lib/@tanstack/react-query/mutations/delete-file-from-list-mutation";
+
 import { PopupStateProvider } from "../../../../providers/popup/PopupStateProvider";
 import { bindTrigger } from "material-ui-popup-state/hooks";
 import { AddFilesToListMenu } from "../../../components/utils/add-files-to-list-dialog";
@@ -35,6 +35,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import { FilterMenu } from "../../../components/utils/Filter-dialog";
 import FilterAltIcon from "@mui/icons-material/FilterAlt";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
+import { DeleteFileFromListDialog } from "../../../components/utils/delete-files-from-list-dialog";
 
 const darkTheme = createTheme({
   palette: {
@@ -49,6 +50,7 @@ const darkTheme = createTheme({
     },
   },
 });
+const defaultTheme = createTheme();
 
 const SearchIconWrapper = styled("div")(({ theme }) => ({
   padding: theme.spacing(0, 2),
@@ -72,9 +74,9 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     width: "100%",
     fontSize: "1.3rem",
     "&::placeholder": {
-      color: "#94a3b8", // light slate for placeholder
+      color: "#94a3b8", 
       opacity: 1,
-      fontSize: "1.3rem", // keep visible
+      fontSize: "1.3rem", 
     },
   },
 }));
@@ -84,8 +86,15 @@ const ListaCustom = () => {
   const { id, nome } = useParams();
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [selectedFileIds, setSelectedFileIds] = useState<string[]>([]);
-  const [currentPage, setCurrentPage] = useState<number>(0);
-  const [rowsPerPage, setRowsPerPage] = useState<number>(10);
+  const [currentPage, setCurrentPage] = useState<number>(() => {
+    const saved = sessionStorage.getItem(`currentPageLista${id}`);
+    return saved !== null ? Number(saved) : 0;
+  });
+
+  const [rowsPerPage, setRowsPerPage] = useState<number>(() => {
+    const saved = sessionStorage.getItem(`rowsPerPageLista${id}`);
+    return saved !== null ? Number(saved) : 10;
+  });
 
   useEffect(() => {
     if (id) {
@@ -98,22 +107,20 @@ const ListaCustom = () => {
   }, [id]);
   const [selectStat, handleSelectStat] = useState<string[]>([]);
   const [globalFilter, setGlobalFilter] = useState("");
-  const { data, refetch } = useQuery({
-    ...getListOptions({
+  const { data, refetch } = useQuery(
+    getListOptions({
       id: id ?? "",
       page: currentPage + 1,
       limit: rowsPerPage,
       q: globalFilter || undefined,
       status: selectStat.length > 0 ? selectStat : undefined,
     }),
-    enabled: !!id,
-  });
+   
+  );
 
-  const deleteFile = useDeleteFileList(id ?? "", {
-    onSuccess: () => {
-      refetch();
-    },
-  });
+
+
+  console.log("currentPage", currentPage + 1);
 
   const columns: GridColDef[] = [
     {
@@ -229,29 +236,42 @@ const ListaCustom = () => {
             gap={3}
             sx={{ height: "100%", width: "100wh" }}
           >
-            <Button
-              variant="text"
-              onClick={(event) => {
-                event.stopPropagation();
-                deleteFile.mutate({ fileIds: [params.value] });
-              }}
-              sx={{
-                width: 35,
-                height: 35,
-                minWidth: 0,
-                borderRadius: "50%",
-                boxShadow: 3,
-                "&:hover": { backgroundColor: "white" },
-                "& svg": {
-                  color: "white",
-                },
-                "&:hover svg": {
-                  color: "red",
-                },
-              }}
-            >
-              <DeleteIcon />
-            </Button>
+            <PopupStateProvider variant="dialog">
+              {({ popupState }) => (
+                <>
+                  <Button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      popupState.open();
+                    }}
+                    variant="text"
+                    sx={{
+                      width: 35,
+                      height: 35,
+                      minWidth: 0,
+                      borderRadius: "50%",
+                      boxShadow: 3,
+                      "&:hover": { backgroundColor: "white" },
+                      "& svg": {
+                        color: "white",
+                      },
+                      "&:hover svg": {
+                        color: "red",
+                      },
+                    }}
+                  >
+                    <DeleteIcon />
+                  </Button>
+                  <ThemeProvider theme={defaultTheme}>
+                    <DeleteFileFromListDialog
+                      id={id ?? ""}
+                      fileIds={[params.value]}
+                    />
+                  </ThemeProvider>
+                </>
+              )}
+            </PopupStateProvider>
+
             <Button
               variant="text"
               onClick={(event) => {
@@ -439,6 +459,38 @@ const ListaCustom = () => {
 
                 <AddFilesToListMenu
                   popupState={popupState}
+                  fileIds={selectedFileIds}
+                />
+              </>
+            )}
+          </PopupStateProvider>
+          <PopupStateProvider variant="dialog">
+            {({ popupState }) => (
+              <>
+                <Button
+                  {...bindTrigger(popupState)}
+                  variant="text"
+                  disabled={selectedFileIds.length === 0}
+                  sx={{
+                    width: 40,
+                    height: 40,
+                    minWidth: 0,
+                    backgroundColor: selectedFileIds.length > 0 ? "white" : "",
+                    borderRadius: "50%",
+                    boxShadow: 3,
+                    "& svg": {
+                      color: selectedFileIds.length > 0 ? "#1e293b" : "white",
+                    },
+                    "&:hover svg": {
+                      color: selectedFileIds.length > 0 ? "red" : "#1e293b",
+                    },
+                  }}
+                >
+                  <DeleteIcon />
+                </Button>
+
+                <DeleteFileFromListDialog
+                  id={id ?? ""}
                   fileIds={selectedFileIds}
                 />
               </>

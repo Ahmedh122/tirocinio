@@ -73,7 +73,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 
 const ListaPrincipale = () => {
   const navigate = useNavigate();
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [selectedFileIds, setSelectedFileIds] = useState<string[]>([]);
   const [selectStat, handleSelectStat] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(() => {
@@ -109,9 +109,7 @@ const ListaPrincipale = () => {
     })
   );
 
-  console.log("currentPage", currentPage + 1);
-  console.log("rowsPerPage", rowsPerPage);
-  console.log("data", data);
+  console.log("currentPagePrincipale", currentPage);
 
   const columns: GridColDef[] = [
     {
@@ -421,6 +419,7 @@ const ListaPrincipale = () => {
               </>
             )}
           </PopupStateProvider>
+        
           <Button
             variant="text"
             onClick={(event) => {

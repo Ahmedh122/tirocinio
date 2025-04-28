@@ -1,4 +1,3 @@
-import { z } from "zod";
 import { apiClient } from "../../../ky/api-client";
 import {
   useMutation,
@@ -9,13 +8,7 @@ import { useSnackbar } from "notistack";
 import { queryClient } from "../query-client";
 
 
-export type RemoveFileFromListSchema = z.infer<ReturnType<typeof removeFileFromListSchema>>;
 
-export function removeFileFromListSchema() {
-  return z.object({
-    fileIds: z.array(z.string()),
-  });
-}
 
 export type ReturnListType = {
   name: string;
@@ -34,14 +27,14 @@ export interface ApiError {
 
 export type ApiErrorResponse = ApiError;
 
-export  function makeDelFileListQueryKey(id:string) {
+export  function makeDeleteListQueryKey(id:string) {
   return ['modlist', {id}] as const;
 }
 
-export function useDeleteFileList(
+export function useDeleteList(
     id: string,
   options?: Omit<
-    UseMutationOptions<ReturnListType, ApiErrorResponse, RemoveFileFromListSchema>,
+    UseMutationOptions<ReturnListType, ApiErrorResponse, void>,
     "mutationKey" | "mutationFn" 
   >
 ) {
@@ -50,15 +43,13 @@ export function useDeleteFileList(
 
   return useMutation({
     ...options,
-    mutationKey: makeDelFileListQueryKey(id) ,
+    mutationKey: makeDeleteListQueryKey(id) ,
 
-    async mutationFn(data: RemoveFileFromListSchema) {
+    async mutationFn() {
       try {
         const response = await apiClient
-          .put(`lists/removeFiles/${id}`, {
-            json: {
-              fileIds: data.fileIds,
-            },
+          .delete(`lists/${id}`, {
+           
           })
           .json<ReturnListType>();
     
@@ -76,11 +67,10 @@ export function useDeleteFileList(
     onSuccess(data, variables, context) {
       snackbar.enqueueSnackbar({
         variant: "success",
-        message: "file removed from list successfully!",
+        message: "list removed successfully!",
       });
-      queryClient.invalidateQueries({queryKey : ["list" , {id}]})
-      queryClient.invalidateQueries({queryKey : ["lists"]})
 
+      queryClient.invalidateQueries({queryKey: ["lists"]});
       options?.onSuccess?.(data, variables, context);
     },
 

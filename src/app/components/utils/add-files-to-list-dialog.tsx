@@ -13,7 +13,7 @@ import { styled } from "@mui/material/styles";
 import { useCreateList } from "../../../lib/@tanstack/react-query/mutations/create-list-mutation";
 import { useQuery } from "@tanstack/react-query";
 import { getListsOptions } from "../../../lib/@tanstack/react-query/queries/get-lists";
-import React, { useEffect, useState } from "react";
+import React, {  useState } from "react";
 import { bindMenu } from "material-ui-popup-state/hooks";
 import { CustomScrollbar } from "./CustomScrollBar";
 import DoneIcon from "@mui/icons-material/Done";
@@ -81,9 +81,7 @@ export function AddFilesToListMenu({
     list.name.toLowerCase().includes(search.toLowerCase())
   );
 
-  useEffect(() => {
-    console.log("idLista", idLista);
-  });
+ 
 
   return (
     <Popover

@@ -28,12 +28,61 @@ export type GetListParams = {
 };
 
 
-export  function makeGetListQueryKey(params:GetListParams) {
-  return ['list', {params}] as const;
+export  function makeGetListQueryKey(id: string) {
+  return ['list', {id}] as const;
 }
 
-export async function getList({signal, id}:{signal?:AbortSignal, id: string} ){
-  const response = await apiClient.get(`lists/${id}`, { signal }).json<GetListSuccessResponse>();
+export async function getList({signal, id, searchParams}:{signal?:AbortSignal, id: string,  searchParams?: GetListParams } ){
+
+  let url = `lists/${id}`;
+
+  if (searchParams) {
+    const urlSearchParams = new URLSearchParams();
+
+   
+
+    if (searchParams.page) {
+      urlSearchParams.append('page', String(searchParams.page));
+    }
+
+    if (searchParams.limit) {
+      urlSearchParams.append('limit', String(searchParams.limit));
+    }
+
+    if (searchParams.status?.length) {
+      for (const status of searchParams.status) {
+        urlSearchParams.append('status[]', status);
+      }
+    }
+
+    if (searchParams.sort === 'file_name') {
+      urlSearchParams.append('sort', 'pdf.originalname');
+    } else if (searchParams.sort === 'status' || searchParams.sort === 'uploaded') {
+      urlSearchParams.append('sort', searchParams.sort);
+    } else if (searchParams.sort) {
+      urlSearchParams.append('sort', `result.CAMPI.${searchParams.sort}`);
+    }
+
+    if (searchParams.sortMethod !== null && searchParams.sortMethod !== undefined) {
+      urlSearchParams.append('sortMethod', String(searchParams.sortMethod));
+    }
+
+    if (searchParams.q) {
+      urlSearchParams.append('q', searchParams.q);
+    }
+    if (searchParams.search) {
+      for (const [key, value] of Object.entries(searchParams.search)) {
+        if (value && key === 'file_name') {
+          urlSearchParams.append('search[pdf.originalname]', value);
+        } else if (value) {
+          urlSearchParams.append(`search[result.CAMPI.${key}]`, value);
+        }
+      }
+    }
+
+    url += `?${urlSearchParams.toString()}`;
+  }
+  const response = await apiClient.get(url, { signal }).json<GetListSuccessResponse>();
   return response;
 
 }
@@ -59,11 +108,12 @@ export async function getList({signal, id}:{signal?:AbortSignal, id: string} ){
         if (!params.id) throw new Error("Missing file ID");
         return queryOptions({
           ...options,
-          queryKey: makeGetListQueryKey(params),
+          queryKey: makeGetListQueryKey(params.id),
           async queryFn({ signal }) {
             const response = await getList({
               signal,
               id: params.id,
+              searchParams : params
             });
             return response;
           },
