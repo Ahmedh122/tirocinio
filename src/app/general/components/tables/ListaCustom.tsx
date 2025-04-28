@@ -83,16 +83,17 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 
 const ListaCustom = () => {
   const navigate = useNavigate();
-  const { id, nome } = useParams();
+  const {  nome } = useParams();
+  const id = sessionStorage.getItem("selectedItemId") ?? "";
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [selectedFileIds, setSelectedFileIds] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(() => {
-    const saved = sessionStorage.getItem(`currentPageLista${id}`);
+    const saved = sessionStorage.getItem(`currentPage${id}`);
     return saved !== null ? Number(saved) : 0;
   });
 
   const [rowsPerPage, setRowsPerPage] = useState<number>(() => {
-    const saved = sessionStorage.getItem(`rowsPerPageLista${id}`);
+    const saved = sessionStorage.getItem(`rowsPerPage${id}`);
     return saved !== null ? Number(saved) : 10;
   });
 
@@ -119,8 +120,13 @@ const ListaCustom = () => {
   );
 
 
-
-  console.log("currentPage", currentPage + 1);
+  useEffect(() => {
+    console.log("currentPage" ,currentPage)
+    refetch();
+  }, [currentPage, rowsPerPage,refetch]);
+  
+  
+  
 
   const columns: GridColDef[] = [
     {
@@ -553,8 +559,7 @@ const ListaCustom = () => {
                   rowsPerPage={rowsPerPage}
                   pageSizeOptions={pageSizeOptions}
                   onPageChange={setCurrentPage}
-                  onRowsPerPageChange={setRowsPerPage}
-                  refetch={refetch}
+                  onRowsPerPageChange={setRowsPerPage}                
                   ListId={id}
                 />
               ),

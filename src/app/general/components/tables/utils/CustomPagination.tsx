@@ -9,7 +9,7 @@ type CustomPaginationProps = {
   pageSizeOptions: number[];
   onPageChange: (value: number) => void;
   onRowsPerPageChange: (value: number) => void;
-  refetch: () => void;
+  
   ListId: string | undefined;
 };
 
@@ -21,7 +21,7 @@ export const CustomPagination = ({
   pageSizeOptions,
   onPageChange,
   onRowsPerPageChange,
-  refetch,
+  
   ListId,
 }: CustomPaginationProps) => {
   
@@ -31,19 +31,21 @@ export const CustomPagination = ({
     const newPage = value - 1; // Subtract 1 because page 1 is index 0 in React state
     onPageChange(newPage);
     sessionStorage.setItem(`currentPage${ListId}`, newPage.toString());
-    refetch();
-    console.log("aaaaaaaaaaa");
+    
+  
   };
   
   // Handle rows per page change
   const handleRowsPerPageChange = async (event: SelectChangeEvent<number>) => {
     const newRowsPerPage = Number(event.target.value);
     onRowsPerPageChange(newRowsPerPage);
-    sessionStorage.setItem(`newRowsPerPage${ListId}`, newRowsPerPage.toString());
-    refetch();
+    sessionStorage.setItem(`rowsPerPage${ListId}`, newRowsPerPage.toString());
+    sessionStorage.setItem(`currentPage${ListId}`, "0");
+    onPageChange(0)
   };
 
 
+  
 
 
   return (

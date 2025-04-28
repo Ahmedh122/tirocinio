@@ -13,7 +13,7 @@ import {
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import Paper from "@mui/material/Paper";
 import { styled } from "@mui/material/styles";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { bindTrigger } from "material-ui-popup-state/hooks";
 import { CustomPagination } from "./utils/CustomPagination";
 import FormatListBulletedAddIcon from "@mui/icons-material/FormatListBulletedAdd";
@@ -109,7 +109,12 @@ const ListaPrincipale = () => {
     })
   );
 
-  console.log("currentPagePrincipale", currentPage);
+
+  useEffect(() => {
+     
+      refetch();
+    }, [currentPage, rowsPerPage, refetch]);
+ 
 
   const columns: GridColDef[] = [
     {
@@ -478,7 +483,7 @@ const ListaPrincipale = () => {
                   pageSizeOptions={pageSizeOptions}
                   onPageChange={setCurrentPage}
                   onRowsPerPageChange={setRowsPerPage}
-                  refetch={refetch}
+            
                   ListId="ListaPrincipale"
                 />
               ),
