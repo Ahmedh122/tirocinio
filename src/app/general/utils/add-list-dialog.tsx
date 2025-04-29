@@ -10,9 +10,9 @@ import {
 import { usePopupStateContext } from "../../../providers/popup/usePopupStateContext";
 import { bindDialog } from "material-ui-popup-state/hooks";
 import React, { useState } from "react";
-import { useCreateList } from "../../../lib/@tanstack/react-query/mutations/create-list-mutation";
-import CloseIcon from "@mui/icons-material/Close";
 
+import CloseIcon from "@mui/icons-material/Close";
+import { useCreateList } from "../../../lib/@tanstack/react-query/mutations/create-list-mutation";
 export function AddListDialog() {
   const [nomeLista, setNomeLista] = useState<string>();
   const creaLista = useCreateList({

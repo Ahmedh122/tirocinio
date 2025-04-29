@@ -22,10 +22,10 @@ import SendIcon from "@mui/icons-material/Send";
 import { useQuery } from "@tanstack/react-query";
 import { getFilesOptions } from "../../../../lib/@tanstack/react-query/queries/get-files";
 import { PopupStateProvider } from "../../../../providers/popup/PopupStateProvider";
-import { AddFilesToListMenu } from "../../../components/utils/add-files-to-list-dialog";
+import { AddFilesToListMenu } from "../tables/utils/add-files-to-list-dialog";
 import SearchIcon from "@mui/icons-material/Search";
 import FilterAltIcon from "@mui/icons-material/FilterAlt";
-import { FilterMenu } from "../../../components/utils/Filter-dialog";
+import { FilterMenu } from "./utils/Filter-dialog";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 
 const darkTheme = createTheme({
@@ -72,21 +72,43 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 const ListaPrincipale = () => {
+
+  const id = "ListaPrincipale"
   const navigate = useNavigate();
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [selectedFileIds, setSelectedFileIds] = useState<string[]>([]);
-  const [selectStat, handleSelectStat] = useState<string[]>([]);
-  const [currentPage, setCurrentPage] = useState<number>(() => {
-    const saved = sessionStorage.getItem("currentPageListaPrincipale");
-    return saved !== null ? Number(saved) : 0;
-  });
+ 
+const [selectedFileIds, setSelectedFileIds] = useState<string[]>([]);
+const [currentPage, setCurrentPage] = useState<number>(() => {
+  const saved = sessionStorage.getItem(`currentPage${id}`);
+  return saved !== null ? Number(saved) : 0;
+});
 
-  const [rowsPerPage, setRowsPerPage] = useState<number>(() => {
-    const saved = sessionStorage.getItem("rowsPerPageListaPrincipale");
-    return saved !== null ? Number(saved) : 10;
-  });
+const [rowsPerPage, setRowsPerPage] = useState<number>(() => {
+  const saved = sessionStorage.getItem(`rowsPerPage${id}`);
+  return saved !== null ? Number(saved) : 10;
+});
 
-  const [globalFilter, setGlobalFilter] = useState("");
+const [searchSaved, setSearchSaved] = useState<boolean>(() => {
+  const saved = sessionStorage.getItem(`isSaved${id}`);
+  try {
+    return saved ? (JSON.parse(saved) as boolean) : false;
+  } catch {
+    return false;
+  }
+});
+
+
+const [selectStat, handleSelectStat] = useState<string[]>(() => {
+  const saved = sessionStorage.getItem(`statusFilter${id}`);
+  try {
+    return saved ? (JSON.parse(saved) as string[]) : [];
+  } catch {
+    return [];
+  }
+});
+const [globalFilter, setGlobalFilter] = useState(() => {
+  const saved = sessionStorage.getItem(`globalFilter${id}`);
+  return saved !== null ? saved : "";
+});
 
   const { data, refetch } = useQuery(
     getFilesOptions({
@@ -334,6 +356,10 @@ const ListaPrincipale = () => {
                 event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
               ) => {
                 setGlobalFilter(event.target.value);
+                sessionStorage.removeItem(`globalFilter${id}`);
+                sessionStorage.removeItem(`statusFilter${id}`);
+                sessionStorage.removeItem(`isSaved${id}`);
+                setSearchSaved(false);
                 refetch();
               }}
               inputProps={{ "aria-label": "search" }}
@@ -366,6 +392,8 @@ const ListaPrincipale = () => {
                 <FilterMenu
                   popupState={popupState}
                   handleSelectStat={handleSelectStat}
+                  setSearchSaved={setSearchSaved}
+                  id={id}
                 />
               </>
             )}
@@ -374,6 +402,21 @@ const ListaPrincipale = () => {
             variant="text"
             onClick={(event) => {
               event.stopPropagation();
+              setSearchSaved((prevSaved) => {
+                if (!prevSaved) {
+                  sessionStorage.setItem(
+                    `statusFilter${id}`,
+                    JSON.stringify(selectStat)
+                  );
+                  sessionStorage.setItem(`globalFilter${id}`, globalFilter);
+                  sessionStorage.setItem(`isSaved${id}`, JSON.stringify(true));
+                } else {
+                  sessionStorage.removeItem(`statusFilter${id}`);
+                  sessionStorage.removeItem(`globalFilter${id}`);
+                  sessionStorage.removeItem(`isSaved${id}`);
+                }
+                return !prevSaved;
+              });
             }}
             sx={{
               width: 40,
@@ -383,7 +426,7 @@ const ListaPrincipale = () => {
               boxShadow: 3,
               backgroundColor: "white",
               "& svg": {
-                color: "#1e293b",
+                color: searchSaved ? "blue" : "#1e293b",
               },
               "&:hover svg": {
                 color: "blue",

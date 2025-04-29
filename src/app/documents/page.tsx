@@ -19,7 +19,7 @@ import SendIcon from "@mui/icons-material/Send";
 import { useNavigate, useParams  } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { getFileOptions } from "../../../../lib/@tanstack/react-query/queries/get-single-file";
+import { getFileOptions } from "../../lib/@tanstack/react-query/queries/get-single-file";
 
 
 

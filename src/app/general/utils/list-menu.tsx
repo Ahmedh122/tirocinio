@@ -5,9 +5,9 @@ import { faPen, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { PopupStateProvider } from "../../../providers/popup/PopupStateProvider";
-import { EditListName } from "./edit-list-name-dialog";
+import { EditListName } from "../../general/utils/edit-list-name-dialog";
 import { bindTrigger } from "material-ui-popup-state/hooks";
-import { DeleteListDialog } from "./delete-list-dialog";
+import { DeleteListDialog } from "../../general/utils/delete-list-dialog";
 import { useState, useEffect } from "react";
 type ListMenuProps = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

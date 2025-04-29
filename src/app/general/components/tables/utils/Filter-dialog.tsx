@@ -1,16 +1,17 @@
 import { Box, Popover, Stack, Typography, Checkbox } from "@mui/material";
 import { bindMenu } from "material-ui-popup-state/hooks";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router";
+
 
 type FilterMenuProps = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   popupState: any;
   handleSelectStat: (selectedStatuses: string[]) => void;
-  setSearchSaved: (search : boolean)=> void
+  setSearchSaved: (search : boolean)=> void;
+  id: string
 };
 
-export function FilterMenu({ popupState, handleSelectStat, setSearchSaved }: FilterMenuProps) {
+export function FilterMenu({ popupState, handleSelectStat, setSearchSaved, id }: FilterMenuProps) {
   const statuses = [
     "COMPLETED",
     "EXPORTED",
@@ -20,7 +21,7 @@ export function FilterMenu({ popupState, handleSelectStat, setSearchSaved }: Fil
     "PENDING",
     "IN PROGRESS",
   ];
-  const { id } = useParams();
+ 
   const [checkedStatuses, setCheckedStatuses] = useState<
     Record<string, boolean>
   >(Object.fromEntries(statuses.map((status) => [status, false])));
@@ -35,6 +36,7 @@ export function FilterMenu({ popupState, handleSelectStat, setSearchSaved }: Fil
     } catch {
       // fall back to all false if parsing fails
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   const handleChange = (

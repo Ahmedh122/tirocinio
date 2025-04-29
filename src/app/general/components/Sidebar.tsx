@@ -2,16 +2,16 @@ import MoreHorizRoundedIcon from "@mui/icons-material/MoreHorizRounded";
 import React, { useRef, useState } from "react";
 import { Box, Button, Paper, Stack, Typography } from "@mui/material";
 import { PopupStateProvider } from "../../../providers/popup/PopupStateProvider"; // Ensure correct import
-import { AddListButton } from "../../components/utils/add-list-button";
-import { AddListDialog } from "../../components/utils/add-list-dialog";
+import { AddListButton } from "../utils/add-list-button";
+import { AddListDialog } from "../utils/add-list-dialog";
 import { useNavigate } from "react-router";
 import { useQuery } from "@tanstack/react-query";
 import { getListsOptions } from "../../../lib/@tanstack/react-query/queries/get-lists";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHouse, faBars } from "@fortawesome/free-solid-svg-icons";
-import { CustomScrollbar } from "../../components/utils/CustomScrollBar";
+import { CustomScrollbar } from "../../utils/CustomScrollBar";
 import { bindTrigger } from "material-ui-popup-state/hooks";
-import { ListMenu } from "../../components/utils/list-menu";
+import { ListMenu } from "../utils/list-menu";
 export function Sidebar() {
   const navigate = useNavigate();
   const { data } = useQuery(getListsOptions());

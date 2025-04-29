@@ -32,11 +32,11 @@ export const router = createBrowserRouter([
   {
     
     path: "documents/:type/:id",
-    lazy: () => import("./app/documents/[type]/[id]/layout"),
+    lazy: () => import("./app/documents/layout"),
     children: [
       {
         index: true,
-        lazy: () => import("./app/documents/[type]/[id]/page"),
+        lazy: () => import("./app/documents/page"),
       },
     ],
   },

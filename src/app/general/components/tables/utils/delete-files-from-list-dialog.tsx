@@ -6,13 +6,13 @@ import {
     Stack,
     Typography,
   } from "@mui/material";
-  import { usePopupStateContext } from "../../../providers/popup/usePopupStateContext";
+  import { usePopupStateContext } from "../../../../../providers/popup/usePopupStateContext";
   import { bindDialog } from "material-ui-popup-state/hooks";
 
   
   
 
-import { useDeleteFileList } from "../../../lib/@tanstack/react-query/mutations/delete-file-from-list-mutation";
+import { useDeleteFileList } from "../../../../../lib/@tanstack/react-query/mutations/delete-file-from-list-mutation";
   
   type DeleteFileFromListDialogProps = {
     id: string ;

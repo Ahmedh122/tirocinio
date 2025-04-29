@@ -10,15 +10,15 @@ import {
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import { styled } from "@mui/material/styles";
-import { useCreateList } from "../../../lib/@tanstack/react-query/mutations/create-list-mutation";
+import { useCreateList } from "../../../../../lib/@tanstack/react-query/mutations/create-list-mutation";
 import { useQuery } from "@tanstack/react-query";
-import { getListsOptions } from "../../../lib/@tanstack/react-query/queries/get-lists";
+import { getListsOptions } from "../../../../../lib/@tanstack/react-query/queries/get-lists";
 import React, {  useState } from "react";
 import { bindMenu } from "material-ui-popup-state/hooks";
-import { CustomScrollbar } from "./CustomScrollBar";
+import { CustomScrollbar } from "../../../../utils/CustomScrollBar";
 import DoneIcon from "@mui/icons-material/Done";
 import ListIcon from "@mui/icons-material/List";
-import { useModifyList } from "../../../lib/@tanstack/react-query/mutations/modify-list-mutation";
+import { useModifyList } from "../../../../../lib/@tanstack/react-query/mutations/modify-list-mutation";
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
 
 const SearchIconWrapper = styled("div")(({ theme }) => ({

@@ -17,7 +17,6 @@ export const CustomScrollbar: React.FC<CustomScrollbarProps> = ({
   height,
   width,
   marginLeft,
-  //bgColor = "#475569",
   thumbColor = "#334155",
   hoverThumbColor = "#94a3b8",
   dependency,
@@ -69,7 +68,7 @@ export const CustomScrollbar: React.FC<CustomScrollbarProps> = ({
 
   useEffect(() => {
     updateThumbHeight();
-    handleScroll(); // initial sync
+    handleScroll(); 
 
     const el = scrollRef.current;
     if (!el) return;
@@ -85,6 +84,7 @@ export const CustomScrollbar: React.FC<CustomScrollbarProps> = ({
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseup", handleMouseUp);
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [thumbHeight, isDragging]);
 
   useEffect(() => {
@@ -98,7 +98,7 @@ export const CustomScrollbar: React.FC<CustomScrollbarProps> = ({
       <Box
         ref={scrollRef}
         sx={{
-         // backgroundColor: bgColor,
+       
           color: "white",
           borderBottomLeftRadius: 8,
           borderBottomRightRadius: 8,
@@ -126,11 +126,10 @@ export const CustomScrollbar: React.FC<CustomScrollbarProps> = ({
           onMouseDown={handleMouseDown}
           sx={{
             position: "absolute",
-            // Constrain the thumb's top to ensure it stays within bounds
             top: `${Math.min(
               thumbTop + 10,
               (scrollRef.current?.clientHeight || 0) - thumbHeight - 10
-            )}px`, // Account for the top offset and prevent overflow
+            )}px`, 
             right: 0,
             width: "8px",
             height: `${thumbHeight -15}px`,

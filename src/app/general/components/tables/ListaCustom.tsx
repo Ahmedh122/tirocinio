@@ -30,12 +30,12 @@ import { getListOptions } from "../../../../lib/@tanstack/react-query/queries/ge
 
 import { PopupStateProvider } from "../../../../providers/popup/PopupStateProvider";
 import { bindTrigger } from "material-ui-popup-state/hooks";
-import { AddFilesToListMenu } from "../../../components/utils/add-files-to-list-dialog";
+import { AddFilesToListMenu } from "../tables/utils/add-files-to-list-dialog";
 import SearchIcon from "@mui/icons-material/Search";
-import { FilterMenu } from "../../../components/utils/Filter-dialog";
+import { FilterMenu } from "./utils/Filter-dialog";
 import FilterAltIcon from "@mui/icons-material/FilterAlt";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
-import { DeleteFileFromListDialog } from "../../../components/utils/delete-files-from-list-dialog";
+import { DeleteFileFromListDialog } from "./utils/delete-files-from-list-dialog";
 
 const darkTheme = createTheme({
   palette: {
@@ -85,7 +85,7 @@ const ListaCustom = () => {
   const navigate = useNavigate();
   const { id, nome } = useParams();
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+   
   const [selectedFileIds, setSelectedFileIds] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(() => {
     const saved = sessionStorage.getItem(`currentPage${id}`);
@@ -449,6 +449,7 @@ const ListaCustom = () => {
                   popupState={popupState}
                   handleSelectStat={handleSelectStat}
                   setSearchSaved={setSearchSaved}
+                  id={id?? ''}
                 />
               </>
             )}
