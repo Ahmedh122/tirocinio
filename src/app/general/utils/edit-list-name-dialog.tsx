@@ -39,10 +39,10 @@ type EditListNameProps ={
         scroll="body"
         sx={{
           "& .MuiDialog-paper": {
-            overflow: "visible", // <- allow overflow
+            overflow: "visible", 
             position: "relative",
-            height: "20vh", // ← Adjust as needed
-            maxHeight: "none", // so the button can position against it
+            height: "20vh", 
+            maxHeight: "none", 
           },
         }}
       >

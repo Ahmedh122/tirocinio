@@ -32,7 +32,7 @@ const darkTheme = createTheme({
   palette: {
     mode: "dark",
     background: {
-      default: "#141a21", // adjust as needed
+      default: "#141a21", 
       paper: "#1e293b",
     },
     text: {
@@ -377,9 +377,12 @@ const [globalFilter, setGlobalFilter] = useState(() => {
                     minWidth: 0,
                     borderRadius: "50%",
                     boxShadow: 3,
-                    backgroundColor: "white",
+                    backgroundColor: selectStat.length>0 ? "black": "white",
+                    "&:hover" : {
+                      backgroundColor: "#e1e3e8",
+                    },
                     "& svg": {
-                      color: "#1e293b",
+                      color: selectStat.length>0 ?"white":"#1e293b",
                     },
                     "&:hover svg": {
                       color: "black",
@@ -424,12 +427,12 @@ const [globalFilter, setGlobalFilter] = useState(() => {
               minWidth: 0,
               borderRadius: "50%",
               boxShadow: 3,
-              backgroundColor: "white",
+              backgroundColor: searchSaved? "#00b4d8" : "white",
               "& svg": {
-                color: searchSaved ? "blue" : "#1e293b",
+                color: searchSaved ? "white" : "#1e293b",
               },
               "&:hover svg": {
-                color: "blue",
+                color: searchSaved ? "white" : "#00b4d8",
               },
             }}
           >
@@ -502,8 +505,28 @@ const [globalFilter, setGlobalFilter] = useState(() => {
             rowCount={data?.totalItems ?? 0}
             checkboxSelection
             disableRowSelectionOnClick
+            rowSelectionModel={
+              rows?.length
+                ? rows
+                    .map((row) => row.id)
+                    .filter((id) => selectedFileIds.includes(id))
+                : []
+            }
             onRowSelectionModelChange={(newSelection) => {
-              setSelectedFileIds(newSelection as string[]);
+              const currentIds = newSelection as string[];
+              if (!rows || rows.length === 0) return;
+              const idsFromOtherPages = selectedFileIds.filter(
+                (id) => !rows.some((row) => row.id === id)
+              );
+              const newSelected = Array.from(
+                new Set([...idsFromOtherPages, ...currentIds])
+              );
+
+              setSelectedFileIds(newSelected);
+              sessionStorage.setItem(
+                "selectedFileIds",
+                JSON.stringify(newSelected)
+              );
             }}
             onRowClick={(params, event) => {
               if (
@@ -531,6 +554,7 @@ const [globalFilter, setGlobalFilter] = useState(() => {
                 />
               ),
             }}
+            hideFooterSelectedRowCount
             sx={{
               border: 0,
               "& .MuiDataGrid-cell:focus, & .MuiDataGrid-cell:focus-within": {
@@ -556,6 +580,41 @@ const [globalFilter, setGlobalFilter] = useState(() => {
           />
         </Paper>
       </ThemeProvider>
+       <Box
+              width={"90%"}
+              height={80}
+              display={"flex"}
+              alignItems={"center"}
+              paddingLeft={2}
+            >
+            
+                  <Typography
+                    variant="h5"
+                    sx={{ color: "white", fontWeight: "bold" }}
+                  >
+                    File selzionati: {selectedFileIds.length}
+                  </Typography>{" "}
+                  <Button
+                    onClick={()=>{sessionStorage.removeItem("selectedFileIds");
+                      setSelectedFileIds([]); }}
+                    sx={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      width: "7%",
+                      height: "40%",
+                      marginLeft: 4,
+                      padding: 2,
+                      fontWeight: "bold",
+                      backgroundColor: selectedFileIds.length > 0 ?"#adb5bd": "#6c757d",
+                      borderRadius: "4px !important",
+                      "&:hover": { backgroundColor: "#6c757d" },
+                    }}
+                  >
+                    Unselect
+                  </Button>
+              
+            </Box>
     </Box>
   );
 };

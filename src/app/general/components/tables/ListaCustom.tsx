@@ -85,7 +85,6 @@ const ListaCustom = () => {
   const navigate = useNavigate();
   const { id, nome } = useParams();
 
-   
   const [selectedFileIds, setSelectedFileIds] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(() => {
     const saved = sessionStorage.getItem(`currentPage${id}`);
@@ -105,6 +104,8 @@ const ListaCustom = () => {
       return false;
     }
   });
+
+ 
   useEffect(() => {
     if (id) {
       const savedPage = sessionStorage.getItem(`currentPage${id}`);
@@ -129,6 +130,8 @@ const ListaCustom = () => {
         setSearchSaved(false);
       }
     }
+    sessionStorage.removeItem("selectedFileIds");
+    setSelectedFileIds([]);
   }, [id]);
 
   const [selectStat, handleSelectStat] = useState<string[]>(() => {
@@ -433,9 +436,12 @@ const ListaCustom = () => {
                     minWidth: 0,
                     borderRadius: "50%",
                     boxShadow: 3,
-                    backgroundColor: "white",
+                    backgroundColor: selectStat.length>0 ? "black": "white",
+                    "&:hover": {
+                      backgroundColor: "#e1e3e8",
+                    },
                     "& svg": {
-                      color: "#1e293b",
+                      color: selectStat.length>0 ?"white":"#1e293b",
                     },
                     "&:hover svg": {
                       color: "black",
@@ -449,7 +455,7 @@ const ListaCustom = () => {
                   popupState={popupState}
                   handleSelectStat={handleSelectStat}
                   setSearchSaved={setSearchSaved}
-                  id={id?? ''}
+                  id={id ?? ""}
                 />
               </>
             )}
@@ -480,12 +486,12 @@ const ListaCustom = () => {
               minWidth: 0,
               borderRadius: "50%",
               boxShadow: 3,
-              backgroundColor: "white",
+              backgroundColor: searchSaved ? "#00b4d8" : "white",
               "& svg": {
-                color: searchSaved ? "blue" : "#1e293b",
+                color: searchSaved ? "white" : "#1e293b",
               },
               "&:hover svg": {
-                color: "blue",
+                color: searchSaved ? "white" : "#00b4d8",
               },
             }}
           >
@@ -541,7 +547,7 @@ const ListaCustom = () => {
                       color: selectedFileIds.length > 0 ? "#1e293b" : "white",
                     },
                     "&:hover svg": {
-                      color: selectedFileIds.length > 0 ? "red" : "#1e293b",
+                      color: selectedFileIds.length > 0 ? "#ef233c" : "#1e293b",
                     },
                   }}
                 >
@@ -590,8 +596,28 @@ const ListaCustom = () => {
             rowCount={data?.totalItems ?? 0}
             checkboxSelection
             disableRowSelectionOnClick
+            rowSelectionModel={
+              rows?.length
+                ? rows
+                    .map((row) => row.id)
+                    .filter((id) => selectedFileIds.includes(id))
+                : []
+            }
             onRowSelectionModelChange={(newSelection) => {
-              setSelectedFileIds(newSelection as string[]);
+              const currentIds = newSelection as string[];
+              if (!rows || rows.length === 0) return;
+              const idsFromOtherPages = selectedFileIds.filter(
+                (id) => !rows.some((row) => row.id === id)
+              );
+              const newSelected = Array.from(
+                new Set([...idsFromOtherPages, ...currentIds])
+              );
+
+              setSelectedFileIds(newSelected);
+              sessionStorage.setItem(
+                "selectedFileIds",
+                JSON.stringify(newSelected)
+              );
             }}
             onRowClick={(params, event) => {
               if (
@@ -618,6 +644,7 @@ const ListaCustom = () => {
                 />
               ),
             }}
+            hideFooterSelectedRowCount
             sx={{
               border: 0,
               "& .MuiDataGrid-cell:focus, & .MuiDataGrid-cell:focus-within": {
@@ -635,6 +662,41 @@ const ListaCustom = () => {
           />
         </Paper>
       </ThemeProvider>
+      <Box
+        width={"90%"}
+        height={80}
+        display={"flex"}
+        alignItems={"center"}
+        paddingLeft={2}
+      >
+      
+            <Typography
+              variant="h5"
+              sx={{ color: "white", fontWeight: "bold" }}
+            >
+              File selzionati: {selectedFileIds.length}
+            </Typography>{" "}
+            <Button
+              onClick={()=>{sessionStorage.removeItem("selectedFileIds");
+                setSelectedFileIds([]); }}
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                width: "7%",
+                height: "40%",
+                marginLeft: 4,
+                padding: 2,
+                fontWeight: "bold",
+                backgroundColor: selectedFileIds.length > 0 ?"#adb5bd": "#6c757d",
+                borderRadius: "4px !important",
+                "&:hover": { backgroundColor: "#6c757d" },
+              }}
+            >
+              Unselect
+            </Button>
+        
+      </Box>
     </Box>
   );
 };
