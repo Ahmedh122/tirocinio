@@ -74,17 +74,17 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     width: "100%",
     fontSize: "1.3rem",
     "&::placeholder": {
-      color: "#94a3b8", 
+      color: "#94a3b8",
       opacity: 1,
-      fontSize: "1.3rem", 
+      fontSize: "1.3rem",
     },
   },
 }));
 
 const ListaCustom = () => {
   const navigate = useNavigate();
-  const {  nome } = useParams();
-  const id = sessionStorage.getItem("selectedItemId") ?? "";
+  const { id, nome } = useParams();
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [selectedFileIds, setSelectedFileIds] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(() => {
@@ -97,17 +97,52 @@ const ListaCustom = () => {
     return saved !== null ? Number(saved) : 10;
   });
 
+  const [searchSaved, setSearchSaved] = useState<boolean>(() => {
+    const saved = sessionStorage.getItem(`isSaved${id}`);
+    try {
+      return saved ? (JSON.parse(saved) as boolean) : false;
+    } catch {
+      return false;
+    }
+  });
   useEffect(() => {
     if (id) {
       const savedPage = sessionStorage.getItem(`currentPage${id}`);
       const savedRows = sessionStorage.getItem(`rowsPerPage${id}`);
-
+      const savedGlobal = sessionStorage.getItem(`globalFilter${id}`);
+      const savedStats = sessionStorage.getItem(`statusFilter${id}`);
+      const savedSearch = sessionStorage.getItem(`isSaved${id}`);
       setCurrentPage(savedPage !== null ? Number(savedPage) : 0);
       setRowsPerPage(savedRows !== null ? Number(savedRows) : 10);
+      setGlobalFilter(savedGlobal !== null ? savedGlobal : "");
+
+      try {
+        handleSelectStat(savedStats !== null ? JSON.parse(savedStats) : []);
+      } catch {
+        handleSelectStat([]);
+      }
+      try {
+        setSearchSaved(
+          savedSearch !== null ? (JSON.parse(savedSearch) as boolean) : false
+        );
+      } catch {
+        setSearchSaved(false);
+      }
     }
   }, [id]);
-  const [selectStat, handleSelectStat] = useState<string[]>([]);
-  const [globalFilter, setGlobalFilter] = useState("");
+
+  const [selectStat, handleSelectStat] = useState<string[]>(() => {
+    const saved = sessionStorage.getItem(`statusFilter${id}`);
+    try {
+      return saved ? (JSON.parse(saved) as string[]) : [];
+    } catch {
+      return [];
+    }
+  });
+  const [globalFilter, setGlobalFilter] = useState(() => {
+    const saved = sessionStorage.getItem(`globalFilter${id}`);
+    return saved !== null ? saved : "";
+  });
   const { data, refetch } = useQuery(
     getListOptions({
       id: id ?? "",
@@ -115,18 +150,12 @@ const ListaCustom = () => {
       limit: rowsPerPage,
       q: globalFilter || undefined,
       status: selectStat.length > 0 ? selectStat : undefined,
-    }),
-   
+    })
   );
 
-
   useEffect(() => {
-    console.log("currentPage" ,currentPage)
     refetch();
-  }, [currentPage, rowsPerPage,refetch]);
-  
-  
-  
+  }, [currentPage, rowsPerPage, refetch, searchSaved]);
 
   const columns: GridColDef[] = [
     {
@@ -272,6 +301,7 @@ const ListaCustom = () => {
                     <DeleteFileFromListDialog
                       id={id ?? ""}
                       fileIds={[params.value]}
+                      refetch={refetch}
                     />
                   </ThemeProvider>
                 </>
@@ -379,7 +409,13 @@ const ListaCustom = () => {
               onChange={(
                 event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
               ) => {
-                setGlobalFilter(event.target.value);
+                const newValue = event.target.value;
+                setGlobalFilter(newValue);
+                sessionStorage.removeItem(`globalFilter${id}`);
+                sessionStorage.removeItem(`statusFilter${id}`);
+                sessionStorage.removeItem(`isSaved${id}`);
+                setSearchSaved(false);
+
                 refetch();
               }}
               inputProps={{ "aria-label": "search" }}
@@ -412,6 +448,7 @@ const ListaCustom = () => {
                 <FilterMenu
                   popupState={popupState}
                   handleSelectStat={handleSelectStat}
+                  setSearchSaved={setSearchSaved}
                 />
               </>
             )}
@@ -420,6 +457,21 @@ const ListaCustom = () => {
             variant="text"
             onClick={(event) => {
               event.stopPropagation();
+              setSearchSaved((prevSaved) => {
+                if (!prevSaved) {
+                  sessionStorage.setItem(
+                    `statusFilter${id}`,
+                    JSON.stringify(selectStat)
+                  );
+                  sessionStorage.setItem(`globalFilter${id}`, globalFilter);
+                  sessionStorage.setItem(`isSaved${id}`, JSON.stringify(true));
+                } else {
+                  sessionStorage.removeItem(`statusFilter${id}`);
+                  sessionStorage.removeItem(`globalFilter${id}`);
+                  sessionStorage.removeItem(`isSaved${id}`);
+                }
+                return !prevSaved;
+              });
             }}
             sx={{
               width: 40,
@@ -429,7 +481,7 @@ const ListaCustom = () => {
               boxShadow: 3,
               backgroundColor: "white",
               "& svg": {
-                color: "#1e293b",
+                color: searchSaved ? "blue" : "#1e293b",
               },
               "&:hover svg": {
                 color: "blue",
@@ -498,6 +550,7 @@ const ListaCustom = () => {
                 <DeleteFileFromListDialog
                   id={id ?? ""}
                   fileIds={selectedFileIds}
+                  refetch={refetch}
                 />
               </>
             )}
@@ -559,7 +612,7 @@ const ListaCustom = () => {
                   rowsPerPage={rowsPerPage}
                   pageSizeOptions={pageSizeOptions}
                   onPageChange={setCurrentPage}
-                  onRowsPerPageChange={setRowsPerPage}                
+                  onRowsPerPageChange={setRowsPerPage}
                   ListId={id}
                 />
               ),

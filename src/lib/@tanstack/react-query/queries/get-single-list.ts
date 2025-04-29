@@ -28,8 +28,8 @@ export type GetListParams = {
 };
 
 
-export  function makeGetListQueryKey(id: string) {
-  return ['list', {id}] as const;
+export  function makeGetListQueryKey(params : GetListParams) {
+  return ['list', {params}] as const;
 }
 
 export async function getList({signal, id, searchParams}:{signal?:AbortSignal, id: string,  searchParams?: GetListParams } ){
@@ -108,7 +108,7 @@ export async function getList({signal, id, searchParams}:{signal?:AbortSignal, i
         if (!params.id) throw new Error("Missing file ID");
         return queryOptions({
           ...options,
-          queryKey: makeGetListQueryKey(params.id),
+          queryKey: makeGetListQueryKey(params),
           async queryFn({ signal }) {
             const response = await getList({
               signal,

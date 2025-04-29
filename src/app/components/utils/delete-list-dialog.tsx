@@ -83,7 +83,7 @@ export function DeleteListDialog({
                 event.preventDefault();
                 cancellaLista.mutate();
               }}
-              sx={{ width: "30%", height: "60%", marginBottom:4 ,  backgroundColor:"#776BB2",  "&:hover":{backgroundColor:"#ad5cd1"}}}
+              sx={{ width: "30%", height: "60%", marginBottom:4 ,  backgroundColor:"#776BB2",  "&:hover":{backgroundColor:"#8338ec"}}}
             >
               {" "}
               <Typography sx={{ fontWeight: "bold" }}>Cancella</Typography>
@@ -92,7 +92,7 @@ export function DeleteListDialog({
               onClick={() => {
                 popupState.close();
               }}
-              sx={{ width: "30%", height: "60%" , marginBottom:4, backgroundColor:"#c3c6d1",  "&:hover":{backgroundColor:"#858ead"} }}
+              sx={{ width: "30%", height: "60%" , marginBottom:4, backgroundColor:"#adb5bd",  "&:hover":{backgroundColor:"#6c757d"} }}
             >
               <Typography sx={{ fontWeight: "bold" }}>Annulla</Typography>
             </Button>

@@ -11,14 +11,16 @@ const TextViewer = ({ text }: { text: string }) => {
         height: "95%",
         padding: 1,
         overflow: "auto",
+       
       }}
     >
       <Box sx={{ padding: 1 }}>
+        
         <TextField
           id="outlined-multiline-static"
           label="Text response"
           multiline
-          rows={22}
+        rows={32}
           value={inputText}
           sx={{ width: "100%", height: "100%" }}
           onChange={(

@@ -22,6 +22,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getFileOptions } from "../../../../lib/@tanstack/react-query/queries/get-single-file";
 
 
+
 type RouteParams = {
   nome: string;
   id: string;
@@ -32,7 +33,7 @@ function Document() {
   const { id } = useParams<RouteParams>();
   
 
-  const {data} = useQuery({
+  const {data, isLoading} = useQuery({
     ...getFileOptions(id ?? ''),
     enabled: !!id,
 
@@ -94,8 +95,8 @@ function Document() {
     <>
     <Box
       sx={{
-        height: "95%",
-        width: "95%",
+        height: "100%",
+        width: "100%",
       }}
     >
       <Stack
@@ -121,7 +122,7 @@ function Document() {
           <Box sx={{ display: "flex", alignItems: "center" }}>
             <IconButton
               onClick={() => navigate(-1)}
-              sx={{ color: "rgba(0, 0, 0, 0.54)", marginRight: "10px" }}
+              sx={{ color: "#8d99ae", marginRight: "10px" }}
             >
               <ArrowBackIosNewIcon />
             </IconButton>
@@ -129,7 +130,7 @@ function Document() {
               variant="h5"
               component="h1"
               sx={{
-                color: "grey.700",
+                color: "#ffffff",
                 fontStyle: "italic",
               }}
             >
@@ -141,7 +142,9 @@ function Document() {
             spacing={2}
             alignItems="center"
             justifyContent="space-between"
-            sx={{ width: "49%" }}
+            sx={{ width: "49%"}}
+            paddingRight={3}
+            
           >
             {!isSmallScreen && (
               <Box
@@ -203,7 +206,7 @@ function Document() {
               </Box>
             )}
             {isSmallScreen && <Box sx={{ flexGrow: 1 }} />}
-            <Button>
+            <Button  >
               <SendIcon />
             </Button>
           </Stack>
@@ -235,8 +238,9 @@ function Document() {
             }}
             size={{ xs: 12, lg: 6 }}
           >
-            {docTxtSw ? (
-              <TextViewer text={'da aggiungere il testo'} />
+            {docTxtSw ? (<>
+          {!isLoading && <TextViewer text={data?.debug ?? "no text"} /> }
+              </>
             ) : (
               <>
                 {

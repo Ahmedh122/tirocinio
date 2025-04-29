@@ -145,12 +145,13 @@ export function DocumentViewer({ url, extension }: DocumentViewerProps) {
   return (
     <Paper
      
-      variant="outlined"
+      variant="elevation"
+      elevation={12}
       sx={{
         width: "100%",
         height: "95%",
-        padding: 1,
-        backgroundColor: theme.palette.background.paper,
+       
+        
       }}
     >
       {renderContent()}

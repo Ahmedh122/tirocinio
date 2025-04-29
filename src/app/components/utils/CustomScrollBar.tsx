@@ -17,7 +17,7 @@ export const CustomScrollbar: React.FC<CustomScrollbarProps> = ({
   height,
   width,
   marginLeft,
-  bgColor = "#475569",
+  //bgColor = "#475569",
   thumbColor = "#334155",
   hoverThumbColor = "#94a3b8",
   dependency,
@@ -98,7 +98,7 @@ export const CustomScrollbar: React.FC<CustomScrollbarProps> = ({
       <Box
         ref={scrollRef}
         sx={{
-          backgroundColor: bgColor,
+         // backgroundColor: bgColor,
           color: "white",
           borderBottomLeftRadius: 8,
           borderBottomRightRadius: 8,

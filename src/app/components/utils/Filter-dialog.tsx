@@ -1,14 +1,16 @@
 import { Box, Popover, Stack, Typography, Checkbox } from "@mui/material";
 import { bindMenu } from "material-ui-popup-state/hooks";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router";
 
 type FilterMenuProps = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   popupState: any;
   handleSelectStat: (selectedStatuses: string[]) => void;
+  setSearchSaved: (search : boolean)=> void
 };
 
-export function FilterMenu({ popupState, handleSelectStat }: FilterMenuProps) {
+export function FilterMenu({ popupState, handleSelectStat, setSearchSaved }: FilterMenuProps) {
   const statuses = [
     "COMPLETED",
     "EXPORTED",
@@ -18,10 +20,22 @@ export function FilterMenu({ popupState, handleSelectStat }: FilterMenuProps) {
     "PENDING",
     "IN PROGRESS",
   ];
-
+  const { id } = useParams();
   const [checkedStatuses, setCheckedStatuses] = useState<
     Record<string, boolean>
   >(Object.fromEntries(statuses.map((status) => [status, false])));
+  useEffect(() => {
+    const raw = sessionStorage.getItem(`statusFilter${id}`);
+    try {
+      const savedStatuses = raw ? (JSON.parse(raw) as string[]) : [];
+      const newChecked = Object.fromEntries(
+        statuses.map((status) => [status, savedStatuses.includes(status)])
+      );
+      setCheckedStatuses(newChecked);
+    } catch {
+      // fall back to all false if parsing fails
+    }
+  }, [id]);
 
   const handleChange = (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -36,8 +50,11 @@ export function FilterMenu({ popupState, handleSelectStat }: FilterMenuProps) {
     // Notify parent with selected ones
     const selected = Object.keys(updated).filter((key) => updated[key]);
     handleSelectStat(selected);
+    sessionStorage.removeItem(`statusFilter${id}`);
+    sessionStorage.removeItem(`globalFilter${id}`);
+    sessionStorage.removeItem(`isSaved${id}`);
+    setSearchSaved(false);
   };
-
   return (
     <Popover
       {...bindMenu(popupState)}

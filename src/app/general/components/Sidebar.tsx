@@ -38,9 +38,10 @@ export function Sidebar() {
         <Stack
           direction="row"
           spacing={1}
-          justifyContent="flex-start"
+          justifyContent="space-between"
           alignItems={"center"}
           height={60}
+          paddingRight={2}
           sx={{
             backgroundColor: "#1e293b",
             borderRadius: 2,
@@ -57,6 +58,12 @@ export function Sidebar() {
           >
             Training Tool
           </Typography>
+          <Box sx={{ width: 100, height: 50 }}>
+            <img
+              src="/logo.svg"
+              style={{ width: "100%", height: "100%", objectFit: "contain" }}
+            />
+          </Box>
         </Stack>
 
         <Stack
@@ -143,11 +150,12 @@ export function Sidebar() {
               >
                 {data?.map((list) => {
                   if (!buttonRefs.current[list._id]) {
-                    buttonRefs.current[list._id] = React.createRef<HTMLButtonElement>();
+                    buttonRefs.current[list._id] =
+                      React.createRef<HTMLButtonElement>();
                   }
-                
+
                   const buttonRef = buttonRefs.current[list._id];
-                
+
                   return (
                     <Box key={list._id} sx={{ px: 1, py: 0.5 }}>
                       <Stack

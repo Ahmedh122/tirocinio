@@ -16,16 +16,19 @@ import { useDeleteFileList } from "../../../lib/@tanstack/react-query/mutations/
   
   type DeleteFileFromListDialogProps = {
     id: string ;
-    fileIds: string[]
+    fileIds: string[];
+    refetch : ()=>void
   };
   
   export function DeleteFileFromListDialog({
     id,
-   fileIds
+   fileIds,
+   refetch
   }: DeleteFileFromListDialogProps) {
 
     const deleteFilesLista = useDeleteFileList(id, {  
       onSuccess: () => {
+        refetch();
         popupState.close();
       
 
@@ -86,7 +89,7 @@ import { useDeleteFileList } from "../../../lib/@tanstack/react-query/mutations/
                   event.preventDefault();
                   deleteFilesLista.mutate({fileIds});
                 }}
-                sx={{ width: "30%", height: "60%", marginBottom:4 ,  backgroundColor:"#776BB2",  borderRadius: "14px !important", "&:hover":{backgroundColor:"#ad5cd1"}}}
+                sx={{ width: "30%", height: "60%", marginBottom:4 ,  backgroundColor:"#776BB2",  borderRadius: "14px !important", "&:hover":{backgroundColor:"#8338ec"}}}
               >
                 {" "}
                 <Typography sx={{ fontWeight: "bold" , color: 'white'}}>Cancella</Typography>
@@ -95,7 +98,7 @@ import { useDeleteFileList } from "../../../lib/@tanstack/react-query/mutations/
                 onClick={() => {
                   popupState.close();
                 }}
-                sx={{ width: "30%", height: "60%" , marginBottom:4, backgroundColor:"#c3c6d1",  borderRadius: "14px !important",  "&:hover":{backgroundColor:"#858ead"} }}
+                sx={{ width: "30%", height: "60%" , marginBottom:4, backgroundColor:"#adb5bd",  borderRadius: "14px !important",  "&:hover":{backgroundColor:"#6c757d"} }}
               >
                 <Typography sx={{ fontWeight: "bold" , color: 'white'}}>Annulla</Typography>
               </Button>

@@ -4,11 +4,12 @@ import type { Result } from "./result";
 export type ApiFile = {
   _id: string;
   type?: FileType;
-  uploaded:string,
+  uploaded: string;
   file_name?: string;
   type_id: string;
   status: string;
-  pdf:{
+  debug: string;
+  pdf: {
     fieldname?: string;
     originalname?: string;
     encoding?: string;
@@ -16,7 +17,6 @@ export type ApiFile = {
     buffer?: string;
     size?: number;
   };
-  result?: Result; 
-   
+  result?: Result;
 };
- //
+//
