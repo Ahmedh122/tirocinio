@@ -17,7 +17,7 @@ export type GetListErrorResponse = unknown;
 
 
 export type GetListParams = {
-  id: string;
+  id?: string;
   page?: number;
   limit?: number;
   status?: string[];
@@ -112,7 +112,7 @@ export async function getList({signal, id, searchParams}:{signal?:AbortSignal, i
           async queryFn({ signal }) {
             const response = await getList({
               signal,
-              id: params.id,
+              id: params.id??'',
               searchParams : params
             });
             return response;

@@ -18,16 +18,19 @@ import { useDeleteFileList } from "../../../../../lib/@tanstack/react-query/muta
     id: string ;
     fileIds: string[];
     refetch : ()=>void
+    setSelectedFileIds: (fileIds: string[]) => void; 
   };
   
   export function DeleteFileFromListDialog({
     id,
    fileIds,
-   refetch
+   refetch,
+   setSelectedFileIds
   }: DeleteFileFromListDialogProps) {
 
     const deleteFilesLista = useDeleteFileList(id, {  
       onSuccess: () => {
+        setSelectedFileIds([])
         refetch();
         popupState.close();
       

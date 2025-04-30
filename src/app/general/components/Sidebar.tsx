@@ -54,6 +54,7 @@ export function Sidebar() {
               color: "#ffffff",
               fontWeight: 600,
               letterSpacing: 1.5,
+              userSelect: "none" 
             }}
           >
             Training Tool
@@ -92,7 +93,7 @@ export function Sidebar() {
             size="lg"
             style={{ color: "#ffffff" }}
           />
-          <Typography sx={{ color: "white" }}>Tutti i files</Typography>
+          <Typography sx={{ color: "white",  userSelect: "none"  }}>Tutti i files</Typography>
         </Stack>
 
         <Stack direction={"column"} alignItems={"center"}>
@@ -118,7 +119,7 @@ export function Sidebar() {
               size="lg"
               style={{ color: "#ffffff" }}
             />
-            <Typography sx={{ color: "white" }}>Liste</Typography>
+            <Typography sx={{ color: "white" ,  userSelect: "none" }}>Liste</Typography>
             <Stack
               position={"absolute"}
               alignItems={"center"}
@@ -199,12 +200,12 @@ export function Sidebar() {
                               marginRight: 2,
                             }}
                           >
-                            <Typography sx={{ fontWeight: 600 }}>
+                            <Typography sx={{ fontWeight: 600 ,  userSelect: "none" }}>
                               {list.fileCount}
                             </Typography>
                           </Box>
                           <Typography
-                            sx={{ color: "#e1e3e8", fontWeight: "bold", ml: 1 }}
+                            sx={{ color: "#e1e3e8", fontWeight: "bold", ml: 1 ,  userSelect: "none" }}
                           >
                             {list.name}
                           </Typography>

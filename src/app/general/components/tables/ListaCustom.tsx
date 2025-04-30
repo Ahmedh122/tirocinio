@@ -19,7 +19,6 @@ import {
 } from "@mui/material/colors";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import Paper from "@mui/material/Paper";
-import SavedSearchIcon from "@mui/icons-material/SavedSearch";
 import { useEffect, useState } from "react";
 import { CustomPagination } from "./utils/CustomPagination";
 import FormatListBulletedAddIcon from "@mui/icons-material/FormatListBulletedAdd";
@@ -27,7 +26,6 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import SendIcon from "@mui/icons-material/Send";
 import { useQuery } from "@tanstack/react-query";
 import { getListOptions } from "../../../../lib/@tanstack/react-query/queries/get-single-list";
-
 import { PopupStateProvider } from "../../../../providers/popup/PopupStateProvider";
 import { bindTrigger } from "material-ui-popup-state/hooks";
 import { AddFilesToListMenu } from "../tables/utils/add-files-to-list-dialog";
@@ -37,6 +35,10 @@ import FilterAltIcon from "@mui/icons-material/FilterAlt";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { DeleteFileFromListDialog } from "./utils/delete-files-from-list-dialog";
 
+import { ActionsComponent } from "./utils/actions-component";
+import { GetListParams } from "../../../../lib/@tanstack/react-query/queries/get-files";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faXmark } from "@fortawesome/free-solid-svg-icons";
 const darkTheme = createTheme({
   palette: {
     mode: "dark",
@@ -95,46 +97,7 @@ const ListaCustom = () => {
     const saved = sessionStorage.getItem(`rowsPerPage${id}`);
     return saved !== null ? Number(saved) : 10;
   });
-
-  const [searchSaved, setSearchSaved] = useState<boolean>(() => {
-    const saved = sessionStorage.getItem(`isSaved${id}`);
-    try {
-      return saved ? (JSON.parse(saved) as boolean) : false;
-    } catch {
-      return false;
-    }
-  });
-
- 
-  useEffect(() => {
-    if (id) {
-      const savedPage = sessionStorage.getItem(`currentPage${id}`);
-      const savedRows = sessionStorage.getItem(`rowsPerPage${id}`);
-      const savedGlobal = sessionStorage.getItem(`globalFilter${id}`);
-      const savedStats = sessionStorage.getItem(`statusFilter${id}`);
-      const savedSearch = sessionStorage.getItem(`isSaved${id}`);
-      setCurrentPage(savedPage !== null ? Number(savedPage) : 0);
-      setRowsPerPage(savedRows !== null ? Number(savedRows) : 10);
-      setGlobalFilter(savedGlobal !== null ? savedGlobal : "");
-
-      try {
-        handleSelectStat(savedStats !== null ? JSON.parse(savedStats) : []);
-      } catch {
-        handleSelectStat([]);
-      }
-      try {
-        setSearchSaved(
-          savedSearch !== null ? (JSON.parse(savedSearch) as boolean) : false
-        );
-      } catch {
-        setSearchSaved(false);
-      }
-    }
-    sessionStorage.removeItem("selectedFileIds");
-    setSelectedFileIds([]);
-  }, [id]);
-
-  const [selectStat, handleSelectStat] = useState<string[]>(() => {
+  const [selectStat, setSelectStat] = useState<string[]>(() => {
     const saved = sessionStorage.getItem(`statusFilter${id}`);
     try {
       return saved ? (JSON.parse(saved) as string[]) : [];
@@ -146,6 +109,29 @@ const ListaCustom = () => {
     const saved = sessionStorage.getItem(`globalFilter${id}`);
     return saved !== null ? saved : "";
   });
+
+  useEffect(() => {
+    if (id) {
+      const savedPage = sessionStorage.getItem(`currentPage${id}`);
+      const savedRows = sessionStorage.getItem(`rowsPerPage${id}`);
+      const savedGlobal = sessionStorage.getItem(`globalFilter${id}`);
+      const savedStats = sessionStorage.getItem(`statusFilter${id}`);
+
+      setCurrentPage(savedPage !== null ? Number(savedPage) : 0);
+      setRowsPerPage(savedRows !== null ? Number(savedRows) : 10);
+      setGlobalFilter(savedGlobal !== null ? savedGlobal : "");
+
+      try {
+        setSelectStat(savedStats !== null ? JSON.parse(savedStats) : []);
+      } catch {
+        setSelectStat([]);
+      }
+
+      sessionStorage.removeItem("selectedFileIds");
+      setSelectedFileIds([]);
+    }
+  }, [id]);
+
   const { data, refetch } = useQuery(
     getListOptions({
       id: id ?? "",
@@ -156,9 +142,24 @@ const ListaCustom = () => {
     })
   );
 
+  const [params, setParams] = useState<GetListParams>({
+    id: id ?? "",
+    page: currentPage + 1,
+    limit: rowsPerPage,
+    q: globalFilter || undefined,
+    status: selectStat.length > 0 ? selectStat : undefined,
+  });
+
   useEffect(() => {
+    setParams({
+      id: id ?? "",
+      page: currentPage + 1,
+      limit: rowsPerPage,
+      q: globalFilter || undefined,
+      status: selectStat.length > 0 ? selectStat : undefined,
+    });
     refetch();
-  }, [currentPage, rowsPerPage, refetch, searchSaved]);
+  }, [currentPage, rowsPerPage, refetch, globalFilter, selectStat, id]);
 
   const columns: GridColDef[] = [
     {
@@ -305,6 +306,7 @@ const ListaCustom = () => {
                       id={id ?? ""}
                       fileIds={[params.value]}
                       refetch={refetch}
+                      setSelectedFileIds={setSelectedFileIds}
                     />
                   </ThemeProvider>
                 </>
@@ -363,8 +365,8 @@ const ListaCustom = () => {
           display: "flex",
           flexDirection: "row",
           justifyContent: "space-between",
-
-          width: "89%",
+          paddingLeft: 6,
+          width: "95%",
           marginBottom: 3,
         }}
       >
@@ -386,8 +388,8 @@ const ListaCustom = () => {
           direction="row"
           justifyContent="space-between"
           alignItems="center"
-          width="50%"
-          gap={4}
+          width="60%"
+          gap={2}
           marginRight={4}
         >
           <Box
@@ -396,7 +398,7 @@ const ListaCustom = () => {
               borderRadius: "7px",
               boxShadow: 6,
               backgroundColor: "#141a21",
-              width: "50%",
+              width: 400,
               height: 60,
               ml: "-3px",
               display: "flex",
@@ -406,6 +408,23 @@ const ListaCustom = () => {
             <SearchIconWrapper>
               <SearchIcon />
             </SearchIconWrapper>
+            <Box
+              sx={{
+                position: "absolute",
+                top: 5,
+                right: 8,
+                color: "white",
+                cursor: "pointer",
+                
+              }}
+              onClick={() => {
+                setGlobalFilter("");
+                sessionStorage.setItem(`globalFilter${id}`, "");
+                refetch();
+              }}
+            >
+              <FontAwesomeIcon icon={faXmark}  />
+            </Box>
             <StyledInputBase
               placeholder="Search…"
               value={globalFilter}
@@ -414,10 +433,7 @@ const ListaCustom = () => {
               ) => {
                 const newValue = event.target.value;
                 setGlobalFilter(newValue);
-                sessionStorage.removeItem(`globalFilter${id}`);
-                sessionStorage.removeItem(`statusFilter${id}`);
-                sessionStorage.removeItem(`isSaved${id}`);
-                setSearchSaved(false);
+                sessionStorage.setItem(`globalFilter${id}`, newValue);
 
                 refetch();
               }}
@@ -436,12 +452,12 @@ const ListaCustom = () => {
                     minWidth: 0,
                     borderRadius: "50%",
                     boxShadow: 3,
-                    backgroundColor: selectStat.length>0 ? "black": "white",
+                    backgroundColor: selectStat.length > 0 ? "#141a21" : "white",
                     "&:hover": {
                       backgroundColor: "#e1e3e8",
                     },
                     "& svg": {
-                      color: selectStat.length>0 ?"white":"#1e293b",
+                      color: selectStat.length > 0 ? "white" : "#1e293b",
                     },
                     "&:hover svg": {
                       color: "black",
@@ -453,50 +469,14 @@ const ListaCustom = () => {
 
                 <FilterMenu
                   popupState={popupState}
-                  handleSelectStat={handleSelectStat}
-                  setSearchSaved={setSearchSaved}
+                  handleSelectStat={setSelectStat}
+                  selectStat={selectStat}
                   id={id ?? ""}
                 />
               </>
             )}
           </PopupStateProvider>
-          <Button
-            variant="text"
-            onClick={(event) => {
-              event.stopPropagation();
-              setSearchSaved((prevSaved) => {
-                if (!prevSaved) {
-                  sessionStorage.setItem(
-                    `statusFilter${id}`,
-                    JSON.stringify(selectStat)
-                  );
-                  sessionStorage.setItem(`globalFilter${id}`, globalFilter);
-                  sessionStorage.setItem(`isSaved${id}`, JSON.stringify(true));
-                } else {
-                  sessionStorage.removeItem(`statusFilter${id}`);
-                  sessionStorage.removeItem(`globalFilter${id}`);
-                  sessionStorage.removeItem(`isSaved${id}`);
-                }
-                return !prevSaved;
-              });
-            }}
-            sx={{
-              width: 40,
-              height: 40,
-              minWidth: 0,
-              borderRadius: "50%",
-              boxShadow: 3,
-              backgroundColor: searchSaved ? "#00b4d8" : "white",
-              "& svg": {
-                color: searchSaved ? "white" : "#1e293b",
-              },
-              "&:hover svg": {
-                color: searchSaved ? "white" : "#00b4d8",
-              },
-            }}
-          >
-            <SavedSearchIcon />
-          </Button>{" "}
+
           <PopupStateProvider variant="popover">
             {({ popupState }) => (
               <>
@@ -558,32 +538,17 @@ const ListaCustom = () => {
                   id={id ?? ""}
                   fileIds={selectedFileIds}
                   refetch={refetch}
+                  setSelectedFileIds={setSelectedFileIds}
                 />
               </>
             )}
           </PopupStateProvider>
-          <Button
-            variant="text"
-            onClick={(event) => {
-              event.stopPropagation();
-            }}
-            sx={{
-              width: 40,
-              height: 40,
-              minWidth: 0,
-              borderRadius: "50%",
-              boxShadow: 3,
-              backgroundColor: "white",
-              "& svg": {
-                color: "#1e293b",
-              },
-              "&:hover svg": {
-                color: "#1976d2",
-              },
-            }}
-          >
-            <SendIcon />
-          </Button>
+          <ActionsComponent
+            listId={id ?? ""}
+            fileIds={selectedFileIds}
+            params={params}
+            setSelectedFileIds={setSelectedFileIds}
+          />
         </Stack>
       </Box>
       <ThemeProvider theme={darkTheme}>
@@ -669,33 +634,31 @@ const ListaCustom = () => {
         alignItems={"center"}
         paddingLeft={2}
       >
-      
-            <Typography
-              variant="h5"
-              sx={{ color: "white", fontWeight: "bold" }}
-            >
-              File selzionati: {selectedFileIds.length}
-            </Typography>{" "}
-            <Button
-              onClick={()=>{sessionStorage.removeItem("selectedFileIds");
-                setSelectedFileIds([]); }}
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                width: "7%",
-                height: "40%",
-                marginLeft: 4,
-                padding: 2,
-                fontWeight: "bold",
-                backgroundColor: selectedFileIds.length > 0 ?"#adb5bd": "#6c757d",
-                borderRadius: "4px !important",
-                "&:hover": { backgroundColor: "#6c757d" },
-              }}
-            >
-              Unselect
-            </Button>
-        
+        <Typography variant="h5" sx={{ color: "white", fontWeight: "bold" ,  userSelect: "none" }}>
+          File selzionati: {selectedFileIds.length}
+        </Typography>{" "}
+        <Button
+          onClick={() => {
+            sessionStorage.removeItem("selectedFileIds");
+            setSelectedFileIds([]);
+          }}
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+
+            marginLeft: 4,
+            padding: 1,
+            //fontWeight: "bold",
+            backgroundColor: selectedFileIds.length > 0 ? "#adb5bd" : "#6c757d",
+            borderRadius: "4px !important",
+            "&:hover": { backgroundColor: "#6c757d" },
+          }}
+        >
+          <Typography variant="body2" sx={{ position: "relative", top: "1px",  userSelect: "none"  }}>
+            Unselect
+          </Typography>
+        </Button>
       </Box>
     </Box>
   );

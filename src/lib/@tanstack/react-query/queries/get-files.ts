@@ -14,8 +14,8 @@ export type GetFilesErrorResponse = unknown;
 
 
 
-export type GetFilesParams = {
- 
+export type GetListParams = {
+  id?:string,
   page?: number;
   limit?: number;
   status?: string[];
@@ -26,11 +26,11 @@ export type GetFilesParams = {
 };
 
 
-export  function makeGetFilesQueryKey(params?:GetFilesParams) {
+export  function makeGetFilesQueryKey(params?:GetListParams) {
   return ['files', {params}] as const;
 }
 
-export async function getFiles({signal, searchParams}:{signal?:AbortSignal, searchParams?: GetFilesParams } ){
+export async function getFiles({signal, searchParams}:{signal?:AbortSignal, searchParams?: GetListParams } ){
 
   let url = 'files';
 
@@ -89,7 +89,7 @@ export async function getFiles({signal, searchParams}:{signal?:AbortSignal, sear
 }
 
     export function getFilesOptions<TSelectedResponse = GetFilesSuccessResponse>(
-      params: GetFilesParams,
+      params: GetListParams,
        
         options?: Omit<
           UndefinedInitialDataOptions<

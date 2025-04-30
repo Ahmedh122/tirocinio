@@ -213,7 +213,7 @@ export function AddFilesToListMenu({
                       <ListIcon />
                     </Box>
                     <Typography
-                      sx={{ color: "#e1e3e8", fontWeight: "bold", ml: 1 }}
+                      sx={{ color: "#e1e3e8", fontWeight: "bold", ml: 1 ,  userSelect: "none" }}
                     >
                       {list.name}
                     </Typography>

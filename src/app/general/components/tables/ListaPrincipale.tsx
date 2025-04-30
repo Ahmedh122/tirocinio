@@ -17,22 +17,23 @@ import { useEffect, useState } from "react";
 import { bindTrigger } from "material-ui-popup-state/hooks";
 import { CustomPagination } from "./utils/CustomPagination";
 import FormatListBulletedAddIcon from "@mui/icons-material/FormatListBulletedAdd";
-import SavedSearchIcon from "@mui/icons-material/SavedSearch";
 import SendIcon from "@mui/icons-material/Send";
 import { useQuery } from "@tanstack/react-query";
-import { getFilesOptions } from "../../../../lib/@tanstack/react-query/queries/get-files";
+import { getFilesOptions, GetListParams } from "../../../../lib/@tanstack/react-query/queries/get-files";
 import { PopupStateProvider } from "../../../../providers/popup/PopupStateProvider";
 import { AddFilesToListMenu } from "../tables/utils/add-files-to-list-dialog";
 import SearchIcon from "@mui/icons-material/Search";
 import FilterAltIcon from "@mui/icons-material/FilterAlt";
 import { FilterMenu } from "./utils/Filter-dialog";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
-
+import { ActionsComponent } from "./utils/actions-component";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faXmark } from "@fortawesome/free-solid-svg-icons";
 const darkTheme = createTheme({
   palette: {
     mode: "dark",
     background: {
-      default: "#141a21", 
+      default: "#141a21",
       paper: "#1e293b",
     },
     text: {
@@ -72,43 +73,32 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 const ListaPrincipale = () => {
-
-  const id = "ListaPrincipale"
+  const id = "ListaPrincipale";
   const navigate = useNavigate();
- 
-const [selectedFileIds, setSelectedFileIds] = useState<string[]>([]);
-const [currentPage, setCurrentPage] = useState<number>(() => {
-  const saved = sessionStorage.getItem(`currentPage${id}`);
-  return saved !== null ? Number(saved) : 0;
-});
 
-const [rowsPerPage, setRowsPerPage] = useState<number>(() => {
-  const saved = sessionStorage.getItem(`rowsPerPage${id}`);
-  return saved !== null ? Number(saved) : 10;
-});
+  const [selectedFileIds, setSelectedFileIds] = useState<string[]>([]);
+  const [currentPage, setCurrentPage] = useState<number>(() => {
+    const saved = sessionStorage.getItem(`currentPage${id}`);
+    return saved !== null ? Number(saved) : 0;
+  });
 
-const [searchSaved, setSearchSaved] = useState<boolean>(() => {
-  const saved = sessionStorage.getItem(`isSaved${id}`);
-  try {
-    return saved ? (JSON.parse(saved) as boolean) : false;
-  } catch {
-    return false;
-  }
-});
+  const [rowsPerPage, setRowsPerPage] = useState<number>(() => {
+    const saved = sessionStorage.getItem(`rowsPerPage${id}`);
+    return saved !== null ? Number(saved) : 10;
+  });
 
-
-const [selectStat, handleSelectStat] = useState<string[]>(() => {
-  const saved = sessionStorage.getItem(`statusFilter${id}`);
-  try {
-    return saved ? (JSON.parse(saved) as string[]) : [];
-  } catch {
-    return [];
-  }
-});
-const [globalFilter, setGlobalFilter] = useState(() => {
-  const saved = sessionStorage.getItem(`globalFilter${id}`);
-  return saved !== null ? saved : "";
-});
+  const [selectStat, handleSelectStat] = useState<string[]>(() => {
+    const saved = sessionStorage.getItem(`statusFilter${id}`);
+    try {
+      return saved ? (JSON.parse(saved) as string[]) : [];
+    } catch {
+      return [];
+    }
+  });
+  const [globalFilter, setGlobalFilter] = useState(() => {
+    const saved = sessionStorage.getItem(`globalFilter${id}`);
+    return saved !== null ? saved : "";
+  });
 
   const { data, refetch } = useQuery(
     getFilesOptions({
@@ -131,12 +121,24 @@ const [globalFilter, setGlobalFilter] = useState(() => {
     })
   );
 
-
-  useEffect(() => {
-     
+   const [params, setParams] = useState<GetListParams>({
+      id: id,
+      page: currentPage + 1,
+      limit: rowsPerPage,
+      q: globalFilter || undefined,
+      status: selectStat.length > 0 ? selectStat : undefined,
+    });
+  
+    useEffect(() => {
+      setParams({
+        id: id,
+        page: currentPage + 1,
+        limit: rowsPerPage,
+        q: globalFilter || undefined,
+        status: selectStat.length > 0 ? selectStat : undefined,
+      });
       refetch();
-    }, [currentPage, rowsPerPage, refetch]);
- 
+    }, [currentPage,rowsPerPage, refetch, globalFilter, selectStat,id, ]);
 
   const columns: GridColDef[] = [
     {
@@ -306,8 +308,8 @@ const [globalFilter, setGlobalFilter] = useState(() => {
           display: "flex",
           flexDirection: "row",
           justifyContent: "space-between",
-
-          width: "89%",
+          paddingLeft: 6,
+          width: "95%",
           marginBottom: 3,
         }}
       >
@@ -329,8 +331,8 @@ const [globalFilter, setGlobalFilter] = useState(() => {
           direction="row"
           justifyContent="space-between"
           alignItems="center"
-          width="50%"
-          gap={4}
+          width="60%"
+          gap={2}
           marginRight={4}
         >
           <Box
@@ -339,7 +341,7 @@ const [globalFilter, setGlobalFilter] = useState(() => {
               borderRadius: "7px",
               boxShadow: 6,
               backgroundColor: "#141a21",
-              width: "50%",
+              width: 400,
               height: 60,
               ml: "-3px",
               display: "flex",
@@ -349,17 +351,33 @@ const [globalFilter, setGlobalFilter] = useState(() => {
             <SearchIconWrapper>
               <SearchIcon />
             </SearchIconWrapper>
+            <Box
+              sx={{
+                position: "absolute",
+                top: 5,
+                right: 8,
+                color: "white",
+                cursor: "pointer",
+                
+              }}
+              onClick={() => {
+                setGlobalFilter("");
+                sessionStorage.setItem(`globalFilter${id}`, "");
+                refetch();
+              }}
+            >
+              <FontAwesomeIcon icon={faXmark}  />
+            </Box>
             <StyledInputBase
               placeholder="Search…"
               value={globalFilter}
               onChange={(
                 event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
               ) => {
-                setGlobalFilter(event.target.value);
-                sessionStorage.removeItem(`globalFilter${id}`);
-                sessionStorage.removeItem(`statusFilter${id}`);
-                sessionStorage.removeItem(`isSaved${id}`);
-                setSearchSaved(false);
+                const newValue = event.target.value;
+                setGlobalFilter(newValue);
+                sessionStorage.setItem(`globalFilter${id}`, newValue);
+
                 refetch();
               }}
               inputProps={{ "aria-label": "search" }}
@@ -377,12 +395,12 @@ const [globalFilter, setGlobalFilter] = useState(() => {
                     minWidth: 0,
                     borderRadius: "50%",
                     boxShadow: 3,
-                    backgroundColor: selectStat.length>0 ? "black": "white",
-                    "&:hover" : {
+                    backgroundColor: selectStat.length > 0 ? "#141a21" : "white",
+                    "&:hover": {
                       backgroundColor: "#e1e3e8",
                     },
                     "& svg": {
-                      color: selectStat.length>0 ?"white":"#1e293b",
+                      color: selectStat.length > 0 ? "white" : "#1e293b",
                     },
                     "&:hover svg": {
                       color: "black",
@@ -395,49 +413,13 @@ const [globalFilter, setGlobalFilter] = useState(() => {
                 <FilterMenu
                   popupState={popupState}
                   handleSelectStat={handleSelectStat}
-                  setSearchSaved={setSearchSaved}
-                  id={id}
+                  selectStat={selectStat}
+                  id={id ?? ""}
                 />
               </>
             )}
           </PopupStateProvider>
-          <Button
-            variant="text"
-            onClick={(event) => {
-              event.stopPropagation();
-              setSearchSaved((prevSaved) => {
-                if (!prevSaved) {
-                  sessionStorage.setItem(
-                    `statusFilter${id}`,
-                    JSON.stringify(selectStat)
-                  );
-                  sessionStorage.setItem(`globalFilter${id}`, globalFilter);
-                  sessionStorage.setItem(`isSaved${id}`, JSON.stringify(true));
-                } else {
-                  sessionStorage.removeItem(`statusFilter${id}`);
-                  sessionStorage.removeItem(`globalFilter${id}`);
-                  sessionStorage.removeItem(`isSaved${id}`);
-                }
-                return !prevSaved;
-              });
-            }}
-            sx={{
-              width: 40,
-              height: 40,
-              minWidth: 0,
-              borderRadius: "50%",
-              boxShadow: 3,
-              backgroundColor: searchSaved? "#00b4d8" : "white",
-              "& svg": {
-                color: searchSaved ? "white" : "#1e293b",
-              },
-              "&:hover svg": {
-                color: searchSaved ? "white" : "#00b4d8",
-              },
-            }}
-          >
-            <SavedSearchIcon />
-          </Button>{" "}
+
           <PopupStateProvider variant="popover">
             {({ popupState }) => (
               <>
@@ -470,29 +452,12 @@ const [globalFilter, setGlobalFilter] = useState(() => {
               </>
             )}
           </PopupStateProvider>
-        
-          <Button
-            variant="text"
-            onClick={(event) => {
-              event.stopPropagation();
-            }}
-            sx={{
-              width: 40,
-              height: 40,
-              minWidth: 0,
-              borderRadius: "50%",
-              boxShadow: 3,
-              backgroundColor: "white",
-              "& svg": {
-                color: "#1e293b",
-              },
-              "&:hover svg": {
-                color: "#1976d2",
-              },
-            }}
-          >
-            <SendIcon />
-          </Button>
+          <ActionsComponent
+            listId={id ?? ""}
+            fileIds={selectedFileIds}
+            params={params}
+            setSelectedFileIds={setSelectedFileIds}
+          />
         </Stack>
       </Box>
       <ThemeProvider theme={darkTheme}>
@@ -549,7 +514,6 @@ const [globalFilter, setGlobalFilter] = useState(() => {
                   pageSizeOptions={pageSizeOptions}
                   onPageChange={setCurrentPage}
                   onRowsPerPageChange={setRowsPerPage}
-            
                   ListId="ListaPrincipale"
                 />
               ),
@@ -580,41 +544,39 @@ const [globalFilter, setGlobalFilter] = useState(() => {
           />
         </Paper>
       </ThemeProvider>
-       <Box
-              width={"90%"}
-              height={80}
-              display={"flex"}
-              alignItems={"center"}
-              paddingLeft={2}
-            >
-            
-                  <Typography
-                    variant="h5"
-                    sx={{ color: "white", fontWeight: "bold" }}
-                  >
-                    File selzionati: {selectedFileIds.length}
-                  </Typography>{" "}
-                  <Button
-                    onClick={()=>{sessionStorage.removeItem("selectedFileIds");
-                      setSelectedFileIds([]); }}
-                    sx={{
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      width: "7%",
-                      height: "40%",
-                      marginLeft: 4,
-                      padding: 2,
-                      fontWeight: "bold",
-                      backgroundColor: selectedFileIds.length > 0 ?"#adb5bd": "#6c757d",
-                      borderRadius: "4px !important",
-                      "&:hover": { backgroundColor: "#6c757d" },
-                    }}
-                  >
-                    Unselect
-                  </Button>
-              
-            </Box>
+      <Box
+        width={"90%"}
+        height={80}
+        display={"flex"}
+        alignItems={"center"}
+        paddingLeft={2}
+      >
+        <Typography variant="h5" sx={{ color: "white", fontWeight: "bold",  userSelect: "none"  }}>
+          File selzionati: {selectedFileIds.length}
+        </Typography>{" "}
+        <Button
+          onClick={() => {
+            sessionStorage.removeItem("selectedFileIds");
+            setSelectedFileIds([]);
+          }}
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+
+            marginLeft: 4,
+            padding: 1,
+            //fontWeight: "bold",
+            backgroundColor: selectedFileIds.length > 0 ? "#adb5bd" : "#6c757d",
+            borderRadius: "4px !important",
+            "&:hover": { backgroundColor: "#6c757d" },
+          }}
+        >
+          <Typography variant="body2" sx={{ position: "relative", top: "1px" ,  userSelect: "none" }}>
+            Unselect
+          </Typography>
+        </Button>
+      </Box>
     </Box>
   );
 };

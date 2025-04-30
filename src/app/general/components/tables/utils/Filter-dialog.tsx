@@ -7,11 +7,13 @@ type FilterMenuProps = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   popupState: any;
   handleSelectStat: (selectedStatuses: string[]) => void;
-  setSearchSaved: (search : boolean)=> void;
-  id: string
+  id: string,
+  selectStat: string[];
+  
+
 };
 
-export function FilterMenu({ popupState, handleSelectStat, setSearchSaved, id }: FilterMenuProps) {
+export function FilterMenu({ popupState, handleSelectStat, id, selectStat}: FilterMenuProps) {
   const statuses = [
     "COMPLETED",
     "EXPORTED",
@@ -26,18 +28,11 @@ export function FilterMenu({ popupState, handleSelectStat, setSearchSaved, id }:
     Record<string, boolean>
   >(Object.fromEntries(statuses.map((status) => [status, false])));
   useEffect(() => {
-    const raw = sessionStorage.getItem(`statusFilter${id}`);
-    try {
-      const savedStatuses = raw ? (JSON.parse(raw) as string[]) : [];
-      const newChecked = Object.fromEntries(
-        statuses.map((status) => [status, savedStatuses.includes(status)])
-      );
-      setCheckedStatuses(newChecked);
-    } catch {
-      // fall back to all false if parsing fails
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
+    const newChecked = Object.fromEntries(
+      statuses.map((status) => [status, selectStat.includes(status)])
+    );
+    setCheckedStatuses(newChecked);
+  }, [selectStat]);
 
   const handleChange = (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -48,14 +43,13 @@ export function FilterMenu({ popupState, handleSelectStat, setSearchSaved, id }:
       [status]: event.target.checked,
     };
     setCheckedStatuses(updated);
+    
 
     // Notify parent with selected ones
     const selected = Object.keys(updated).filter((key) => updated[key]);
     handleSelectStat(selected);
-    sessionStorage.removeItem(`statusFilter${id}`);
-    sessionStorage.removeItem(`globalFilter${id}`);
-    sessionStorage.removeItem(`isSaved${id}`);
-    setSearchSaved(false);
+    sessionStorage.setItem(`statusFilter${id}`, JSON.stringify(selected));
+
   };
   return (
     <Popover
