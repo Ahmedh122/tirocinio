@@ -32,7 +32,7 @@ export function makeActionKey(id: string) {
 
 export function useAction(
   id: string,
-  params: GetListParams,
+  params?: GetListParams,
   options?: Omit<
     UseMutationOptions<ReturnActionType, ApiErrorResponse, ActionSchema>,
     "mutationKey" | "mutationFn"

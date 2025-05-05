@@ -1,0 +1,17 @@
+.jer-value-and-buttons {
+    align-items: flex-start !important;
+    display: flex !important;
+  }
+  
+  .jer-input-text {
+    height: auto !important;
+    white-space: pre-wrap !important;
+    overflow-wrap: break-word !important;
+    resize: vertical !important;
+    padding: 4px 8px !important;
+  }
+  
+  .jer-collection-name {
+    font-weight: 600 !important;
+  }
+  

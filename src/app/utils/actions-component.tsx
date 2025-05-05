@@ -5,15 +5,15 @@ import SendIcon from "@mui/icons-material/Send";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronRight, faCheck } from "@fortawesome/free-solid-svg-icons";
 import { useQuery } from "@tanstack/react-query";
-import { getActionsOptions } from "../../../../../lib/@tanstack/react-query/queries/get-actions";
-import { useAction } from "../../../../../lib/@tanstack/react-query/mutations/action-mutation";
-import { GetListParams } from "../../../../../lib/@tanstack/react-query/queries/get-single-list";
+import { getActionsOptions } from "../../lib/@tanstack/react-query/queries/get-actions";
+import { useAction } from "../../lib/@tanstack/react-query/mutations/action-mutation";
+import { GetListParams } from "../../lib/@tanstack/react-query/queries/get-single-list";
 
 type ActionsComponentProps = {
-  listId: string;
+  listId?: string;
   fileIds: string[];
-  params: GetListParams;
-  setSelectedFileIds: (fileIds: string[]) => void;
+  params?: GetListParams;
+  setSelectedFileIds?: (fileIds: string[]) => void;
 };
 
 export function ActionsComponent({
@@ -66,7 +66,8 @@ export function ActionsComponent({
 
   const executeAction = useAction(selectedAction.id, params, {
     onSuccess: () => {
-      setSelectedFileIds([]);
+    if(setSelectedFileIds){
+      setSelectedFileIds([]);}
     },
   });
 
@@ -132,7 +133,7 @@ export function ActionsComponent({
           onClick={(event) => {
             event.stopPropagation();
             if (selectedAction.id !== "Nessuna Azione") {
-              executeAction.mutate({ listIds: [listId], fileIds });
+              executeAction.mutate({ listIds: [listId??""], fileIds  });
             }
             setDropdownOpen(false);
           }}

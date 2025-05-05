@@ -26,7 +26,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import FilterAltIcon from "@mui/icons-material/FilterAlt";
 import { FilterMenu } from "./utils/Filter-dialog";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
-import { ActionsComponent } from "./utils/actions-component";
+import { ActionsComponent } from "../../../utils/actions-component";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
 const darkTheme = createTheme({

@@ -18,5 +18,6 @@ export type ApiFile = {
     size?: number;
   };
   result?: Result;
+  newResult?: Result;
 };
 //

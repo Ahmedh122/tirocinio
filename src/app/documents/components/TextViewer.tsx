@@ -1,8 +1,8 @@
 import { Box, Paper, TextField } from "@mui/material";
-import React, { useState } from "react";
 
-const TextViewer = ({ text }: { text: string }) => {
-  const [inputText, setInputText] = useState<string>(text);
+
+const TextViewer = ({ text , setText}: { text: string, setText: (value: string) => void; }) => {
+  
   return (
     <Paper
       variant="outlined"
@@ -21,12 +21,12 @@ const TextViewer = ({ text }: { text: string }) => {
           label="Text response"
           multiline
         rows={32}
-          value={inputText}
+          value={text}
           sx={{ width: "100%", height: "100%" }}
           onChange={(
             event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
           ) => {
-            setInputText(event.target.value);
+            setText(event.target.value);
           }}
         />
       </Box>

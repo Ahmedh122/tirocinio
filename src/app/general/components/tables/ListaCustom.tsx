@@ -35,7 +35,7 @@ import FilterAltIcon from "@mui/icons-material/FilterAlt";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { DeleteFileFromListDialog } from "./utils/delete-files-from-list-dialog";
 
-import { ActionsComponent } from "./utils/actions-component";
+import { ActionsComponent } from "../../../utils/actions-component";
 import { GetListParams } from "../../../../lib/@tanstack/react-query/queries/get-files";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
