@@ -22,7 +22,7 @@ export function makeModFileQueryKey(id: string) {
   return ["modlist", { id }] as const;
 }
 
-export function useModifyFile(
+export function useModifyFileText(
   id: string, 
 ) {
   const queryClient = useQueryClient();
@@ -34,7 +34,7 @@ export function useModifyFile(
     mutationFn: async (data) => {
       try {
         const response = await apiClient
-          .put(`files/${id}`, {
+          .put(`files/text/${id}`, {
             json: {
              edited: data
             },

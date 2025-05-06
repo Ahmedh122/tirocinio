@@ -14,7 +14,7 @@ import { Redo as RedoIcon, Undo as UndoIcon } from "@mui/icons-material";
 import { useEditorHistory } from "../hooks/use-history";
 import "./utils/JsonEditor.css";
 import { useState } from "react";
-//import { useModifyFile } from "../../../lib/@tanstack/react-query/mutations/edit-file-mutation";
+//import { useModifyFileJson } from "../../../lib/@tanstack/react-query/mutations/edit-file-json-mutation";
 
 const JsonViewer = ({
   json,
@@ -28,7 +28,7 @@ const JsonViewer = ({
   newJson: any;
   fileId: string;
 }) => {
-  //const modFile = useModifyFile(fileId)
+  //const saveJson = useModifyFileJson(fileId)
 
   const {
     currentData,
@@ -42,7 +42,7 @@ const JsonViewer = ({
     onUpdate: async (updatedData) => {
       console.log(updatedData);
       {
-        /** await modFile.mutateAsync({
+        /** await saveJson.mutate({
        
        ...updatedData
       }); */
@@ -86,7 +86,7 @@ const JsonViewer = ({
           overflow: "auto",
         }}
       >
-        <Stack direction={"row"} height={50} alignItems={"center"} justifyContent={"space-between"} gap={2} paddingX={4} sx={{backgroundColor:"#1976d2", borderTopLeftRadius: '12px',borderTopRightRadius: '12px'}}>
+        <Stack direction={"row"} height={56} alignItems={"center"} justifyContent={"space-between"} gap={2} paddingX={4} sx={{backgroundColor:"#1976d2", borderTopLeftRadius: '12px',borderTopRightRadius: '12px'}}>
           <Box>
            
               <Box
@@ -98,6 +98,7 @@ const JsonViewer = ({
                   paddingX: 2,
                   borderRadius: 4,
                   width: 200,
+                  marginLeft: -4
                 }}
               >
                 <Typography
@@ -177,7 +178,8 @@ const JsonViewer = ({
         <Box
           sx={{
             width: "100%",
-            height: "95%",
+            height: "91%",
+            paddingBottom:10,
             overflow: "auto",
           }}
         >
